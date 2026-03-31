@@ -1,3 +1,19 @@
 .local/
 .env
 *.env
+.claude
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Rust
+server/target/
+
+# Frontend build output & test artifacts
+frontend/dist/
+frontend/test-results/

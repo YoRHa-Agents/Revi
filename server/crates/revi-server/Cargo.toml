@@ -1,0 +1,44 @@
+[package]
+name    = "revi-server"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "revi"
+path = "src/main.rs"
+
+[lib]
+name = "revi_server"
+path = "src/lib.rs"
+
+[[bench]]
+name    = "api_bench"
+harness = false
+path    = "../../benches/api_bench.rs"
+
+[dependencies]
+axum.workspace             = true
+tokio.workspace            = true
+tower-http.workspace       = true
+tower.workspace            = true
+serde.workspace            = true
+serde_json.workspace       = true
+uuid.workspace             = true
+chrono.workspace           = true
+anyhow.workspace           = true
+thiserror.workspace        = true
+tracing.workspace          = true
+tracing-subscriber.workspace = true
+bytes.workspace            = true
+mime.workspace             = true
+http-body-util.workspace   = true
+clap.workspace             = true
+toml.workspace             = true
+
+[dev-dependencies]
+tempfile.workspace       = true
+criterion.workspace      = true
+tokio.workspace          = true
+tower.workspace          = true
+http-body-util.workspace = true
+serde_json.workspace     = true

@@ -1,0 +1,87 @@
+{
+  "nav": {
+    "home": "主页",
+    "archive": "归档"
+  },
+  "app": {
+    "title": "Revi",
+    "subtitle": "审阅 & 修订"
+  },
+  "sidebar": {
+    "workspace": "工作区",
+    "noItems": "暂无项目",
+    "search": "搜索...",
+    "noResults": "无结果"
+  },
+  "docIndex": {
+    "title": "目录",
+    "hide": "隐藏"
+  },
+  "dashboard": {
+    "welcome": "欢迎使用 Revi",
+    "tagline": "你的 Agent-人类协作审阅与修订空间",
+    "totalItems": "项目",
+    "openComments": "待处理",
+    "resolvedComments": "已解决",
+    "allItems": "全部项目",
+    "open": "打开"
+  },
+  "home": {
+    "title": "待审阅项目",
+    "empty": "暂无项目。将文件放入 workspace/ 目录即可。",
+    "type": {
+      "plan": "计划",
+      "design": "设计",
+      "prototype": "原型"
+    },
+    "openComments": "待处理",
+    "noComments": "暂无评论",
+    "view": "查看",
+    "openFile": "打开文件",
+    "openFolder": "打开文件夹",
+    "uploadFiles": "上传文件",
+    "typeAuto": "自动",
+    "typePlan": "计划",
+    "typeDesign": "设计",
+    "typePrototype": "原型",
+    "uploadConfirm": "上传"
+  },
+  "review": {
+    "back": "← 返回",
+    "openTab": "待处理 ({n})",
+    "resolvedTab": "已解决 ({n})",
+    "addComment": "添加评论",
+    "author": "作者",
+    "content": "评论内容",
+    "reference": "引用位置（可选）",
+    "referencePlaceholder": "例如：## 架构",
+    "submit": "提交",
+    "cancel": "取消",
+    "resolve": "标记已解决",
+    "archiveResolved": "归档已解决 ({n})",
+    "noOpen": "暂无待处理评论",
+    "noResolved": "暂无已解决评论",
+    "search": "搜索",
+    "changeType": "修改类型",
+    "agentExport": "Agent 导出预览",
+    "section": "章节",
+    "line": "行",
+    "general": "通用",
+    "quote": "引用",
+    "annotation": "标注",
+    "step": "步骤",
+    "stepN": "第 {n} 步"
+  },
+  "archive": {
+    "title": "归档历史",
+    "empty": "暂无归档记录",
+    "batch": "归档批次",
+    "archivedAt": "归档时间",
+    "comments": "条评论"
+  },
+  "time": {
+    "justNow": "刚刚",
+    "minutesAgo": "{n} 分钟前",
+    "hoursAgo": "{n} 小时前"
+  }
+}

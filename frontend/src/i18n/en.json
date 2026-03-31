@@ -1,0 +1,87 @@
+{
+  "nav": {
+    "home": "Home",
+    "archive": "Archive"
+  },
+  "app": {
+    "title": "Revi",
+    "subtitle": "Review & Revise"
+  },
+  "sidebar": {
+    "workspace": "WORKSPACE",
+    "noItems": "No items",
+    "search": "Search...",
+    "noResults": "No results"
+  },
+  "docIndex": {
+    "title": "Index",
+    "hide": "Hide"
+  },
+  "dashboard": {
+    "welcome": "Welcome to Revi",
+    "tagline": "Your agent-human coworking review & revise space",
+    "totalItems": "Items",
+    "openComments": "Open",
+    "resolvedComments": "Resolved",
+    "allItems": "All Items",
+    "open": "Open"
+  },
+  "home": {
+    "title": "Review Items",
+    "empty": "No items yet. Drop files into the workspace/ directory.",
+    "type": {
+      "plan": "Plan",
+      "design": "Design",
+      "prototype": "Prototype"
+    },
+    "openComments": "open",
+    "noComments": "No comments",
+    "view": "View",
+    "openFile": "Open File",
+    "openFolder": "Open Folder",
+    "uploadFiles": "Upload Files",
+    "typeAuto": "Auto",
+    "typePlan": "Plan",
+    "typeDesign": "Design",
+    "typePrototype": "Prototype",
+    "uploadConfirm": "Upload"
+  },
+  "review": {
+    "back": "← Back",
+    "openTab": "Open ({n})",
+    "resolvedTab": "Resolved ({n})",
+    "addComment": "Add Comment",
+    "author": "Author",
+    "content": "Comment",
+    "reference": "Reference (optional)",
+    "referencePlaceholder": "e.g. ## Architecture",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "resolve": "Mark resolved",
+    "archiveResolved": "Archive resolved ({n})",
+    "noOpen": "No open comments",
+    "noResolved": "No resolved comments yet",
+    "search": "Search",
+    "changeType": "Change type",
+    "agentExport": "Agent Export Preview",
+    "section": "section",
+    "line": "line",
+    "general": "general",
+    "quote": "quote",
+    "annotation": "annotation",
+    "step": "step",
+    "stepN": "Step {n}"
+  },
+  "archive": {
+    "title": "Archive History",
+    "empty": "No archived batches yet",
+    "batch": "Archive batch",
+    "archivedAt": "Archived at",
+    "comments": "comment(s)"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{n}m ago",
+    "hoursAgo": "{n}h ago"
+  }
+}
