@@ -3,11 +3,7 @@
     <header class="topbar">
       <div class="topbar-left">
         <router-link to="/" class="brand">
-          <span class="brand-logo">R</span>
-          <div class="brand-text">
-            <span class="brand-name">{{ t('app.title') }}</span>
-            <span class="brand-sub">{{ t('app.subtitle') }}</span>
-          </div>
+          <span class="brand-logo">R E V I</span>
         </router-link>
       </div>
       <div class="topbar-right">
@@ -40,42 +36,36 @@ function switchLang(lang) {
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
+body { font-family: var(--serif); background: var(--bg); color: var(--text); }
 
 .app { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-/* Topbar */
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 20px; height: 48px; background: #fff;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 0 20px; height: 44px; background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0; z-index: 100;
 }
 .topbar-left { display: flex; align-items: center; }
-.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand { display: flex; align-items: center; text-decoration: none; }
 .brand-logo {
-  width: 30px; height: 30px; border-radius: 8px;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  color: #fff; font-size: 16px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+  font-family: var(--serif);
+  font-size: 14px; font-weight: 400;
+  letter-spacing: 0.25em;
+  color: var(--text);
 }
-.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
-.brand-name { font-size: 15px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.3px; }
-.brand-sub  { font-size: 10px; color: #9ca3af; letter-spacing: 0.2px; }
 
 .topbar-right { display: flex; align-items: center; gap: 4px; }
 .lang-btn {
-  background: none; border: none; cursor: pointer; font-size: 12px;
-  color: #9ca3af; padding: 3px 7px; border-radius: 4px; transition: all 0.15s;
+  background: none; border: 1px solid transparent; cursor: pointer; font-size: 12px;
+  font-family: var(--serif);
+  color: var(--text-faint); padding: 3px 7px; transition: all 0.15s;
+  letter-spacing: 0.04em;
 }
-.lang-btn:hover { color: #1a1a1a; background: #f3f4f6; }
-.lang-btn.active { color: #1a1a1a; font-weight: 700; }
-.lang-sep { color: #e5e7eb; font-size: 12px; }
+.lang-btn:hover { color: var(--text); border-color: var(--border); }
+.lang-btn.active { color: var(--text); font-weight: 600; }
+.lang-sep { color: var(--border-light); font-size: 12px; }
 
-/* Body layout */
 .body { flex: 1; display: flex; overflow: hidden; }
-
-/* Content area */
 .content { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
 </style>

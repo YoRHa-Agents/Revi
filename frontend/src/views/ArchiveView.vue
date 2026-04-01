@@ -64,53 +64,43 @@ function formatDate(iso) {
 
 <style scoped>
 .archive-page { height: 100%; overflow-y: auto; padding: 28px 32px; }
-.page-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; color: #1a1a1a; }
-.empty { color: #9ca3af; font-size: 14px; padding: 32px 0; text-align: center; }
+.page-title { font-size: 22px; font-weight: 400; margin-bottom: 20px; color: var(--text); letter-spacing: 0.04em; }
+.empty { color: var(--text-faint); font-size: 14px; padding: 32px 0; text-align: center; }
 
 .item-section { margin-bottom: 28px; }
 .item-label { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.item-title { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+.item-title { font-size: 16px; font-weight: 500; color: var(--text); letter-spacing: 0.02em; }
 
 .type-badge {
-  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
-  padding: 3px 8px; border-radius: 20px;
+  font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 2px 8px; border: 1px solid var(--border); color: var(--accent);
 }
-.type-badge.plan      { background: #eff6ff; color: #3b82f6; }
-.type-badge.design    { background: #fdf4ff; color: #a855f7; }
-.type-badge.prototype { background: #f0fdf4; color: #22c55e; }
+.type-badge.plan, .type-badge.design, .type-badge.prototype { background: transparent; }
 
-.batch {
-  background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
-  overflow: hidden; margin-bottom: 12px;
-}
+.batch { background: var(--bg-card); border: 1px solid var(--border); overflow: hidden; margin-bottom: 12px; }
 .batch-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 16px; background: #f9fafb; border-bottom: 1px solid #e5e7eb;
+  padding: 10px 16px; background: var(--bg-alt); border-bottom: 1px solid var(--border);
 }
-.batch-label { font-size: 13px; font-weight: 600; color: #374151; }
-.batch-meta  { font-size: 12px; color: #9ca3af; }
+.batch-label { font-size: 13px; font-weight: 500; color: var(--text-dim); }
+.batch-meta  { font-size: 12px; color: var(--text-faint); }
 
 .batch-comments { padding: 8px 12px; display: flex; flex-direction: column; gap: 8px; }
 
 .archived-comment {
-  padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 7px;
-  border-left: 3px solid #d1fae5; opacity: 0.8;
-  display: flex; flex-direction: column; gap: 5px;
+  padding: 10px 12px; border: 1px solid var(--border); border-left: 3px solid var(--green);
+  opacity: 0.8; display: flex; flex-direction: column; gap: 5px;
 }
 
 .c-meta { display: flex; align-items: center; gap: 8px; }
-.c-author { font-size: 13px; font-weight: 600; color: #1a1a1a; }
-.c-time   { font-size: 11px; color: #9ca3af; margin-left: auto; }
-.resolved-badge { font-size: 11px; color: #10b981; font-weight: 600; }
+.c-author { font-size: 13px; font-weight: 600; color: var(--text); }
+.c-time   { font-size: 11px; color: var(--text-faint); margin-left: auto; }
+.resolved-badge { font-size: 11px; color: var(--green); font-weight: 600; }
 
 .c-ref {
   display: flex; align-items: center; gap: 6px;
-  font-size: 12px; color: #6b7280; background: #f9fafb;
-  padding: 3px 8px; border-radius: 4px;
+  font-size: 12px; color: var(--text-dim); background: var(--bg-alt); padding: 3px 8px;
 }
-.ref-badge {
-  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-  font-weight: 600; color: #9ca3af;
-}
-.c-content { font-size: 14px; color: #374151; line-height: 1.5; }
+.ref-badge { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; color: var(--text-faint); }
+.c-content { font-size: 14px; color: var(--text-dim); line-height: 1.5; }
 </style>
