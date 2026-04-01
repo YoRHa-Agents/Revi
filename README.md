@@ -16,6 +16,8 @@ Revi bridges the gap between human reviewers and AI agents. Reviewers browse mar
 
 <p align="center">
   <a href="https://yorha-agents.github.io/Revi/demo/"><em>Try the interactive demo →</em></a>
+  <br>
+  <a href="https://yorha-agents.github.io/Revi/guide/"><em>Read the live user guide →</em></a>
 </p>
 
 ---
@@ -167,6 +169,7 @@ workspace/
 
 | Guide | Description |
 |-------|-------------|
+| [Live User Guide](https://yorha-agents.github.io/Revi/guide/) | Styled GitHub Pages guide for human reviewers — setup, navigation, comments, anchors, archive workflow |
 | [User Guide](docs/user-guide.md) | UI walkthrough for human reviewers — workspace setup, navigation, commenting, archiving |
 | [Agent API Guide](docs/agent-guide.md) | Full endpoint reference, schemas, reference types, and polling strategies for AI agents |
 | [Deploy Pages](docs/deploy-pages.md) | Step-by-step guide to deploying the GitHub Pages landing site and demo |

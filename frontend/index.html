@@ -3,10 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Revi — Review & Revise</title>
+    <title>Revi — YoRHa Review Division</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
+      :root {
+        --bg:          #DAD4BB;
+        --bg-alt:      #D0C9AE;
+        --bg-sidebar:  #D4CDB7;
+        --bg-card:     #E2DCCA;
+        --bg-input:    #CEC7AC;
+        --bg-dark:     #2A2822;
+        --border:      #9E9A8D;
+        --border-light: #BAB5A1;
+        --text:        #454138;
+        --text-dim:    #7A7668;
+        --text-faint:  #9E9A8D;
+        --accent:      #C2572B;
+        --accent-soft: rgba(194,87,43,0.08);
+        --accent-med:  rgba(194,87,43,0.15);
+        --green:       #5A7A52;
+        --green-soft:  rgba(90,122,82,0.1);
+        --amber:       #8A7A32;
+        --amber-soft:  rgba(138,122,50,0.1);
+        --serif:       'EB Garamond', Georgia, 'Times New Roman', serif;
+        --mono:        'JetBrains Mono', Consolas, monospace;
+      }
+      body {
+        font-family: var(--serif);
+        background: var(--bg);
+        color: var(--text);
+      }
+      ::selection { background: rgba(194,87,43,0.2); }
+      #app::after {
+        content: '';
+        position: fixed; inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1' height='1' fill='%23000' fill-opacity='0.015'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 9999;
+      }
     </style>
   </head>
   <body>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revi — User Guide</title>
+  <meta name="description" content="Human reviewer guide for Revi: workspace setup, navigation, comments, anchors, archive workflow, and agent export preview.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #DAD4BB;
+      --bg-alt:      #D0C9AE;
+      --bg-card:     #D4CDB7;
+      --bg-dark:     #2A2822;
+      --border:      #9E9A8D;
+      --border-light:#BAB5A1;
+      --text:        #454138;
+      --text-dim:    #7A7668;
+      --text-faint:  #9E9A8D;
+      --accent:      #C2572B;
+      --accent-soft: rgba(194,87,43,0.08);
+      --green:       #5A7A52;
+      --green-soft:  rgba(90,122,82,0.1);
+      --amber:       #8A7A32;
+      --amber-soft:  rgba(138,122,50,0.1);
+      --serif:       'EB Garamond', Georgia, 'Times New Roman', serif;
+      --mono:        'JetBrains Mono', 'Consolas', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--serif);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1' height='1' fill='%23000' fill-opacity='0.015'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ::selection { background: rgba(194,87,43,0.2); }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0.8rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(218,212,187,0.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-brand {
+      font-size: 1.1rem;
+      letter-spacing: 0.25em;
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 1.1rem;
+      font-size: 0.85rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .hero {
+      padding: 8rem 0 3rem;
+      text-align: center;
+    }
+
+    .hero-kicker {
+      font-size: 0.75rem;
+      letter-spacing: 0.28em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .ornament {
+      width: 240px;
+      height: 1px;
+      background: var(--border);
+      margin: 0 auto 2rem;
+      position: relative;
+    }
+
+    .ornament::before,
+    .ornament::after {
+      content: '';
+      position: absolute;
+      top: -1.5px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .ornament::before { left: -2px; }
+    .ornament::after { right: -2px; }
+
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      max-width: 700px;
+      margin: 0 auto 1.75rem;
+      font-size: 1.08rem;
+      color: var(--text-dim);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: 2rem;
+      padding-bottom: 4rem;
+    }
+
+    .toc {
+      position: sticky;
+      top: 5.5rem;
+      align-self: start;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 1rem;
+    }
+
+    .toc-title {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .toc a {
+      display: block;
+      padding: 0.35rem 0;
+      color: var(--text-dim);
+      font-size: 0.92rem;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .guide-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 1.5rem 1.6rem;
+    }
+
+    .section-card h2 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-card h3 {
+      font-size: 1.05rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      margin: 1rem 0 0.35rem;
+    }
+
+    .section-card p,
+    .section-card li {
+      color: var(--text-dim);
+      font-size: 0.98rem;
+    }
+
+    .section-card p + p,
+    .section-card p + ul,
+    .section-card ul + p,
+    .section-card h3 + p,
+    .section-card h3 + ul {
+      margin-top: 0.45rem;
+    }
+
+    .section-card ul {
+      margin-left: 1.25rem;
+    }
+
+    .section-card li + li {
+      margin-top: 0.25rem;
+    }
+
+    .callout {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-left: 3px solid var(--accent);
+      background: var(--accent-soft);
+      color: var(--text);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .mini-card {
+      border: 1px solid var(--border-light);
+      padding: 0.9rem 1rem;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .mini-card strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: var(--text);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .code {
+      margin-top: 0.85rem;
+      background: var(--bg-dark);
+      border: 1px solid #454138;
+      color: var(--border-light);
+      padding: 0.9rem 1rem;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      overflow-x: auto;
+    }
+
+    .anchor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--border-light);
+      border: 1px solid var(--border-light);
+      margin-top: 1rem;
+    }
+
+    .anchor-item {
+      background: var(--bg);
+      padding: 1rem;
+    }
+
+    .anchor-item h4 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.04em;
+    }
+
+    .anchor-item p {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+    }
+
+    .table-wrap {
+      margin-top: 1rem;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.7rem 0.85rem;
+      text-align: left;
+      color: var(--text-dim);
+    }
+
+    th {
+      background: var(--bg-alt);
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    footer {
+      padding: 1.75rem 2rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    footer p {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+    }
+
+    footer .easter-egg {
+      margin-top: 0.3rem;
+      color: var(--border-light);
+      font-size: 0.66rem;
+      letter-spacing: 0.2em;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+
+      .two-col,
+      .anchor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links .desktop-only {
+        display: none;
+      }
+
+      .container {
+        padding: 0 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">R E V I</span>
+  <div class="nav-links">
+    <a href="#workspace" class="desktop-only">Workspace</a>
+    <a href="#reviewing" class="desktop-only">Reviewing</a>
+    <a href="#comments" class="desktop-only">Comments</a>
+    <a href="../" class="btn">Home</a>
+    <a href="../demo/" class="btn btn-primary">Live Demo</a>
+  </div>
+</nav>
+
+<div class="container">
+  <header class="hero">
+    <div class="hero-kicker">Human Reviewer Guide</div>
+    <div class="ornament"></div>
+    <h1>Review plans, designs, and prototypes<br>without losing context.</h1>
+    <p>This guide covers the full Revi workflow for human reviewers: preparing the workspace, navigating the interface, leaving anchored comments, resolving feedback, archiving review rounds, and checking what agents will actually receive.</p>
+    <div class="hero-actions">
+      <a href="../demo/" class="btn btn-primary">Open Demo</a>
+      <a href="https://github.com/YoRHa-Agents/Revi/blob/main/docs/user-guide.md" class="btn">Markdown Source</a>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <aside class="toc">
+      <div class="toc-title">Guide Index</div>
+      <a href="#workspace">Workspace setup</a>
+      <a href="#navigation">Navigation</a>
+      <a href="#reviewing">Reviewing items</a>
+      <a href="#comments">Leaving comments</a>
+      <a href="#anchors">Anchor types</a>
+      <a href="#archive">Resolve and archive</a>
+      <a href="#export">Agent export preview</a>
+      <a href="#tips">Tips</a>
+    </aside>
+
+    <main class="guide-content">
+      <section id="workspace" class="section-card">
+        <h2>Workspace Setup</h2>
+        <p>Revi auto-discovers review items from the workspace directory. Place each file in the right subfolder and it appears in the sidebar automatically on the next refresh.</p>
+        <div class="code">workspace/
+  plans/
+  designs/
+  prototypes/</div>
+        <div class="two-col">
+          <div class="mini-card">
+            <strong>plans/</strong>
+            Architecture docs, sprint plans, specs, and any Markdown document you want reviewed with heading anchors and text selection comments.
+          </div>
+          <div class="mini-card">
+            <strong>designs/</strong>
+            Images such as mockups, wireframes, diagrams, and annotated screenshots.
+          </div>
+          <div class="mini-card">
+            <strong>prototypes/</strong>
+            Self-contained HTML files for click-through or step-by-step interactive flows.
+          </div>
+          <div class="mini-card">
+            <strong>Naming</strong>
+            File names become display titles, so descriptive names like <code>sprint-1-design.md</code> and <code>ui-mockup-v2.png</code> work best.
+          </div>
+        </div>
+        <div class="callout">You can also upload files through the API if you do not want to copy them into the workspace manually.</div>
+      </section>
+
+      <section id="navigation" class="section-card">
+        <h2>Navigation</h2>
+        <h3>Sidebar</h3>
+        <p>The left sidebar groups items by type and shows open-comment badges next to any item that still needs attention. Use the search box to quickly filter by name.</p>
+        <h3>Home dashboard</h3>
+        <p>The dashboard summarizes total items, open comments, resolved comments, and archived batches. Each card shows its type, description, and current status.</p>
+        <h3>Language toggle</h3>
+        <p>Use the top-right language switcher to move between English and Chinese. Bilingual items automatically display the matching translated title and description.</p>
+      </section>
+
+      <section id="reviewing" class="section-card">
+        <h2>Reviewing Items</h2>
+        <p>Opening any item brings you into the split review layout: content in the center, comments on the right, and an optional navigation panel on the left for supported item types.</p>
+        <div class="two-col">
+          <div class="mini-card">
+            <strong>Plans</strong>
+            Markdown plans support a document index, in-page search, quote selection, heading anchors, and active section tracking.
+          </div>
+          <div class="mini-card">
+            <strong>Designs</strong>
+            Design files render on a dark canvas with numbered annotation pins. Hovering a matching comment highlights the pin.
+          </div>
+          <div class="mini-card">
+            <strong>Prototypes</strong>
+            Interactive prototype flows use a step navigator with per-step commenting and zoom controls for the visual panel.
+          </div>
+          <div class="mini-card">
+            <strong>Review loop</strong>
+            Reviewers inspect the artifact, leave precise feedback, and then resolve or archive comments after the issue is addressed.
+          </div>
+        </div>
+      </section>
+
+      <section id="comments" class="section-card">
+        <h2>Leaving Comments</h2>
+        <h3>Open the form</h3>
+        <p>Click <strong>Add Comment</strong> in the comment panel. The form expands beneath the action bar.</p>
+        <h3>Use pre-filled anchors</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Anchor created</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Select text in a plan and click the comment tooltip</td>
+                <td><code>quote</code></td>
+              </tr>
+              <tr>
+                <td>Click an annotation pin in a design</td>
+                <td><code>annotation</code></td>
+              </tr>
+              <tr>
+                <td>Click the comment action on a prototype step</td>
+                <td><code>step</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Manual references</h3>
+        <p>If nothing was pre-filled, type a section reference manually, for example <code>## Architecture</code>. Leave the reference empty to create a general comment that applies to the whole item.</p>
+      </section>
+
+      <section id="anchors" class="section-card">
+        <h2>Anchor Types</h2>
+        <p>Every comment can point at a precise location. This makes the review workflow legible for both humans and agents.</p>
+        <div class="anchor-grid">
+          <div class="anchor-item">
+            <h4>section</h4>
+            <p>Link a comment to a Markdown heading such as <code>## Storage Layer</code>.</p>
+          </div>
+          <div class="anchor-item">
+            <h4>quote</h4>
+            <p>Attach feedback to a selected text fragment inside a plan.</p>
+          </div>
+          <div class="anchor-item">
+            <h4>line</h4>
+            <p>Point to a specific line number in a document.</p>
+          </div>
+          <div class="anchor-item">
+            <h4>annotation</h4>
+            <p>Reference a numbered annotation pin on a design image.</p>
+          </div>
+          <div class="anchor-item">
+            <h4>step</h4>
+            <p>Attach feedback to a prototype step in a walkthrough flow.</p>
+          </div>
+          <div class="anchor-item">
+            <h4>general</h4>
+            <p>Leave item-level feedback with no single anchor.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="archive" class="section-card">
+        <h2>Resolve and Archive</h2>
+        <h3>Resolve comments</h3>
+        <p>When a comment has been addressed, click <strong>Mark resolved</strong>. The comment moves from the Open tab to the Resolved tab.</p>
+        <h3>Archive review rounds</h3>
+        <p>Resolved comments stay visible until they are archived. Archiving bundles them into a timestamped batch and clears the active queue for the next review cycle.</p>
+        <h3>Browse archive history</h3>
+        <p>The archive view groups batches by item and preserves the full review history, including author, resolution time, reference, and content.</p>
+      </section>
+
+      <section id="export" class="section-card">
+        <h2>Agent Export Preview</h2>
+        <p>At the bottom of the comment panel you can expand <strong>Agent Export Preview</strong> to inspect the structured JSON that agents receive from <code>GET /api/export/{item_id}</code>.</p>
+        <div class="code">{
+  "schemaVersion": "1.0",
+  "item": { "id": "plans/sprint-1-design", "type": "plan" },
+  "openComments": [...]
+}</div>
+        <div class="callout">Only open comments are exported. Resolved and archived comments are intentionally omitted, so agents only act on unresolved feedback.</div>
+      </section>
+
+      <section id="tips" class="section-card">
+        <h2>Tips</h2>
+        <ul>
+          <li>Use comments with anchors whenever possible so reviewers and agents both know exactly what the feedback refers to.</li>
+          <li>Use the plan search bar to jump between repeated terms before leaving a broad comment.</li>
+          <li>Hover comment cards to confirm that the reference highlights the correct section, quote, pin, or step.</li>
+          <li>Archive resolved batches regularly so the next review round starts clean.</li>
+          <li>Use the live demo if you want to explain the workflow to teammates before setting up a local environment.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+</div>
+
+<footer>
+  <p>Revi &middot; User Guide &middot; <a href="../">Home</a> &middot; <a href="../demo/">Demo</a></p>
+  <p class="easter-egg">Glory to Mankind.</p>
+</footer>
+
+</body>
+</html>

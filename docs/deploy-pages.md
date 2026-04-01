@@ -8,6 +8,7 @@ This guide covers deploying the Revi landing site and interactive demo to GitHub
 |-----|--------|---------|
 | `https://yorha-agents.github.io/Revi/` | `site/index.html` | Landing page |
 | `https://yorha-agents.github.io/Revi/demo/` | `site/demo/index.html` | Interactive demo |
+| `https://yorha-agents.github.io/Revi/guide/` | `site/guide/index.html` | Styled user guide |
 
 ---
 
@@ -58,6 +59,7 @@ git push origin main
 2. Once the job shows a green checkmark, visit:
    - **https://yorha-agents.github.io/Revi/** — landing page
    - **https://yorha-agents.github.io/Revi/demo/** — interactive demo
+   - **https://yorha-agents.github.io/Revi/guide/** — styled user guide
 3. The deployment URL also appears in the workflow run summary under **Environments**
 
 ---
@@ -94,6 +96,8 @@ site/
   index.html          ← Landing page
   demo/
     index.html        ← Interactive demo
+  guide/
+    index.html        ← Styled user guide
 ```
 
 Push to `main` and the workflow deploys automatically. No build step — these are static HTML files served as-is.

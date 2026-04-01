@@ -2,6 +2,8 @@
 
 This guide covers everything a human reviewer needs to know: setting up the workspace, navigating the UI, leaving anchored comments, resolving feedback, and using the archive.
 
+If you want the styled web version, open [the live guide](https://yorha-agents.github.io/Revi/guide/).
+
 ---
 
 ## Workspace Setup
