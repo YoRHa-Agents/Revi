@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revi — Interactive Demo</title>
+  <meta name="description" content="Interactive demo of Revi's review interface — explore plans, designs, and prototype review workflows.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root {
+      --bg: #f8f9fc;
+      --bg-sidebar: #ffffff;
+      --bg-card: #ffffff;
+      --bg-panel: #fafbfe;
+      --border: #e2e5ef;
+      --border-light: #eef0f6;
+      --text: #1a1a2e;
+      --text-dim: #6b7080;
+      --text-faint: #9ba0b0;
+      --accent: #6c63ff;
+      --accent-light: rgba(108,99,255,0.08);
+      --accent-border: rgba(108,99,255,0.25);
+      --green: #10b981;
+      --green-bg: rgba(16,185,129,0.08);
+      --amber: #f59e0b;
+      --amber-bg: rgba(245,158,11,0.08);
+      --rose: #ef4444;
+      --rose-bg: rgba(239,68,68,0.08);
+      --blue: #3b82f6;
+      --blue-bg: rgba(59,130,246,0.08);
+      --font: 'DM Sans', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    html,body { height: 100% }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    .app { display: flex; height: 100%; flex-direction: column }
+
+    /* ---- TOP BAR ---- */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.25rem; height: 48px; min-height: 48px;
+      background: #fff; border-bottom: 1px solid var(--border);
+      z-index: 10;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 1rem }
+    .topbar-brand { font-weight: 700; font-size: 1rem; letter-spacing: 0.06em; color: var(--accent) }
+    .topbar-sep { width: 1px; height: 20px; background: var(--border) }
+    .topbar-title { font-size: 0.85rem; color: var(--text-dim) }
+    .topbar-right { display: flex; align-items: center; gap: 0.75rem }
+    .topbar-badge {
+      font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 999px;
+      background: var(--accent-light); color: var(--accent); font-weight: 600;
+    }
+    .topbar-btn {
+      padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid var(--border);
+      font-size: 0.78rem; cursor: pointer; background: #fff; color: var(--text);
+      font-family: var(--font); transition: all 0.15s;
+    }
+    .topbar-btn:hover { border-color: var(--accent); color: var(--accent) }
+    .topbar-btn.active { background: var(--accent); color: #fff; border-color: var(--accent) }
+    .lang-toggle { display: flex; gap: 0 }
+    .lang-toggle .topbar-btn { border-radius: 0 }
+    .lang-toggle .topbar-btn:first-child { border-radius: 6px 0 0 6px }
+    .lang-toggle .topbar-btn:last-child { border-radius: 0 6px 6px 0; border-left: 0 }
+
+    .main-area { display: flex; flex: 1; overflow: hidden }
+
+    /* ---- SIDEBAR ---- */
+    .sidebar {
+      width: 240px; min-width: 240px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .sidebar-search {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .sidebar-search input {
+      width: 100%; padding: 0.45rem 0.75rem;
+      border: 1px solid var(--border); border-radius: 7px;
+      font-size: 0.8rem; font-family: var(--font);
+      background: var(--bg); color: var(--text);
+      outline: none; transition: border 0.15s;
+    }
+    .sidebar-search input:focus { border-color: var(--accent) }
+    .sidebar-search input::placeholder { color: var(--text-faint) }
+    .sidebar-group { padding: 0.5rem 0 }
+    .sidebar-group-title {
+      padding: 0.3rem 1rem; font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-faint); cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sidebar-group-title:hover { color: var(--text-dim) }
+    .sidebar-item {
+      padding: 0.45rem 1rem 0.45rem 1.5rem;
+      font-size: 0.82rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.12s; border-left: 3px solid transparent;
+    }
+    .sidebar-item:hover { background: var(--accent-light) }
+    .sidebar-item.active {
+      background: var(--accent-light);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+    .sidebar-item .badge {
+      font-size: 0.68rem; padding: 0.1rem 0.45rem; border-radius: 999px;
+      background: var(--rose-bg); color: var(--rose); font-weight: 600;
+    }
+    .sidebar-item .badge.zero { background: var(--green-bg); color: var(--green) }
+
+    /* ---- CONTENT AREA ---- */
+    .content-area { flex: 1; display: flex; overflow: hidden }
+    .content-main { flex: 1; overflow-y: auto; padding: 2rem }
+
+    /* ---- MARKDOWN CONTENT ---- */
+    .md-content { max-width: 780px }
+    .md-content h1 {
+      font-size: 1.6rem; font-weight: 700; margin-bottom: 1rem;
+      padding-bottom: 0.75rem; border-bottom: 2px solid var(--border-light);
+    }
+    .md-content h2 {
+      font-size: 1.2rem; font-weight: 700; margin: 2rem 0 0.75rem;
+      padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light);
+      scroll-margin-top: 80px;
+    }
+    .md-content h3 { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem }
+    .md-content p { margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--text) }
+    .md-content ul { margin: 0 0 0.75rem 1.5rem; font-size: 0.9rem }
+    .md-content li { margin-bottom: 0.3rem; color: var(--text) }
+    .md-content code {
+      font-family: var(--mono); font-size: 0.82rem;
+      background: rgba(108,99,255,0.06); padding: 0.15rem 0.4rem;
+      border-radius: 4px; color: var(--accent);
+    }
+    .md-content pre {
+      background: #1a1a2e; color: #e4e4ef; padding: 1rem 1.25rem;
+      border-radius: var(--radius); margin-bottom: 1rem;
+      overflow-x: auto; font-family: var(--mono); font-size: 0.8rem;
+      line-height: 1.6;
+    }
+    .md-content .highlight-section {
+      animation: sectionFlash 1.5s ease;
+    }
+    @keyframes sectionFlash {
+      0%,100% { background: transparent }
+      30% { background: rgba(108,99,255,0.1) }
+    }
+    .md-content .highlight-quote {
+      background: rgba(251,191,36,0.2);
+      border-radius: 2px; padding: 0 2px;
+    }
+
+    /* ---- DESIGN VIEWER ---- */
+    .design-viewer {
+      display: none;
+      flex: 1;
+      background: #1a1a2e;
+      position: relative;
+      overflow: hidden;
+      align-items: center;
+      justify-content: center;
+    }
+    .design-viewer.visible { display: flex }
+    .design-canvas {
+      position: relative;
+      width: 600px; height: 400px;
+      background: #2a2a40;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .design-frame {
+      position: absolute; border-radius: 6px;
+      background: #3a3a55; border: 1px solid rgba(255,255,255,0.06);
+    }
+    .annotation-pin {
+      position: absolute;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #fbbf24; color: #1a1a2e;
+      font-size: 0.7rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(251,191,36,0.4);
+    }
+    .annotation-pin:hover, .annotation-pin.highlight {
+      transform: scale(1.25);
+      box-shadow: 0 2px 12px rgba(251,191,36,0.6);
+    }
+    .design-legend {
+      position: absolute; bottom: 1rem; left: 1rem; right: 1rem;
+      background: rgba(26,26,46,0.92); backdrop-filter: blur(8px);
+      border-radius: 8px; padding: 0.75rem 1rem;
+      display: flex; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.75rem; color: rgba(255,255,255,0.7);
+    }
+    .legend-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fbbf24; color: #1a1a2e;
+      font-size: 0.6rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ---- PROTOTYPE VIEWER ---- */
+    .proto-viewer { display: none; flex: 1; flex-direction: column }
+    .proto-viewer.visible { display: flex }
+    .proto-steps {
+      width: 200px; min-width: 200px; background: var(--bg-sidebar);
+      border-right: 1px solid var(--border); overflow-y: auto; padding: 0.75rem 0;
+    }
+    .proto-step-item {
+      padding: 0.6rem 1rem; font-size: 0.82rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.12s;
+    }
+    .proto-step-item:hover { background: var(--accent-light) }
+    .proto-step-item.active { background: var(--accent-light); font-weight: 600; color: var(--accent) }
+    .proto-step-item .step-comment-btn {
+      opacity: 0; font-size: 0.75rem; transition: opacity 0.15s;
+    }
+    .proto-step-item:hover .step-comment-btn { opacity: 1 }
+    .proto-frame-area {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      background: var(--bg); padding: 2rem;
+    }
+    .proto-frame {
+      width: 500px; height: 350px; border-radius: var(--radius);
+      background: #fff; border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 0.75rem;
+    }
+    .proto-frame h3 { font-size: 1rem; color: var(--text) }
+    .proto-frame p { font-size: 0.85rem; color: var(--text-dim) }
+    .proto-nav {
+      display: flex; gap: 0.75rem; padding: 0.75rem 1.25rem;
+      border-top: 1px solid var(--border); background: #fff;
+      justify-content: center;
+    }
+    .proto-nav button {
+      padding: 0.4rem 1rem; border-radius: 6px;
+      border: 1px solid var(--border); background: #fff;
+      font-size: 0.8rem; cursor: pointer; font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .proto-nav button:hover { border-color: var(--accent); color: var(--accent) }
+    .proto-nav button.primary { background: var(--accent); color: #fff; border-color: var(--accent) }
+
+    /* ---- COMMENT PANEL ---- */
+    .comment-panel {
+      width: 320px; min-width: 320px;
+      border-left: 1px solid var(--border);
+      background: var(--bg-panel);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .comment-header {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .comment-tabs { display: flex; gap: 0 }
+    .comment-tab {
+      padding: 0.35rem 0.75rem; font-size: 0.78rem; cursor: pointer;
+      border: 1px solid var(--border); background: #fff;
+      transition: all 0.12s; font-family: var(--font);
+    }
+    .comment-tab:first-child { border-radius: 6px 0 0 6px }
+    .comment-tab:last-child { border-radius: 0 6px 6px 0; border-left: 0 }
+    .comment-tab.active { background: var(--accent); color: #fff; border-color: var(--accent) }
+    .comment-tab .tab-count {
+      font-size: 0.68rem; font-weight: 600; margin-left: 0.3rem;
+    }
+    .add-comment-btn {
+      padding: 0.3rem 0.65rem; border-radius: 6px;
+      background: var(--accent); color: #fff; border: none;
+      font-size: 0.78rem; cursor: pointer; font-family: var(--font);
+      font-weight: 500; transition: background 0.15s;
+    }
+    .add-comment-btn:hover { background: #5a52e0 }
+    .comment-list { flex: 1; overflow-y: auto; padding: 0.75rem }
+    .comment-card {
+      background: #fff; border: 1px solid var(--border-light);
+      border-radius: var(--radius); padding: 0.85rem;
+      margin-bottom: 0.6rem;
+      transition: all 0.15s; cursor: default;
+    }
+    .comment-card:hover {
+      border-color: var(--accent-border);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    .comment-card.resolved { opacity: 0.65 }
+    .comment-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.4rem;
+    }
+    .comment-author { font-weight: 600; font-size: 0.82rem }
+    .comment-time { font-size: 0.7rem; color: var(--text-faint) }
+    .comment-ref {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.15rem 0.5rem; border-radius: 4px;
+      font-size: 0.7rem; font-weight: 500; margin-bottom: 0.4rem;
+    }
+    .comment-ref.section { background: var(--accent-light); color: var(--accent) }
+    .comment-ref.quote { background: var(--amber-bg); color: var(--amber) }
+    .comment-ref.annotation { background: var(--amber-bg); color: #92600a }
+    .comment-ref.step { background: var(--green-bg); color: var(--green) }
+    .comment-ref.general { background: var(--bg); color: var(--text-dim) }
+    .comment-body { font-size: 0.84rem; line-height: 1.5; margin-bottom: 0.5rem }
+    .comment-actions { display: flex; gap: 0.5rem }
+    .resolve-btn {
+      padding: 0.25rem 0.6rem; border-radius: 5px;
+      border: 1px solid var(--border); background: #fff;
+      font-size: 0.72rem; cursor: pointer; font-family: var(--font);
+      color: var(--green); transition: all 0.15s;
+    }
+    .resolve-btn:hover { background: var(--green-bg); border-color: var(--green) }
+
+    /* ---- COMMENT FORM ---- */
+    .comment-form {
+      display: none; padding: 0.85rem;
+      border-bottom: 1px solid var(--border-light);
+      background: #fff;
+    }
+    .comment-form.visible { display: block }
+    .comment-form .form-row { margin-bottom: 0.6rem }
+    .comment-form label { display: block; font-size: 0.72rem; font-weight: 600; margin-bottom: 0.2rem; color: var(--text-dim) }
+    .comment-form input, .comment-form textarea {
+      width: 100%; padding: 0.45rem 0.65rem; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 0.82rem; font-family: var(--font);
+      outline: none; transition: border 0.15s; background: var(--bg);
+    }
+    .comment-form input:focus, .comment-form textarea:focus { border-color: var(--accent) }
+    .comment-form textarea { min-height: 70px; resize: vertical }
+    .form-actions { display: flex; gap: 0.5rem; justify-content: flex-end }
+    .form-actions button {
+      padding: 0.4rem 0.85rem; border-radius: 6px;
+      font-size: 0.8rem; cursor: pointer; font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .cancel-btn { border: 1px solid var(--border); background: #fff; color: var(--text) }
+    .submit-btn { background: var(--accent); color: #fff; border: none; font-weight: 500 }
+    .submit-btn:hover { background: #5a52e0 }
+    .anchor-tag {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.2rem 0.5rem; border-radius: 5px;
+      background: var(--accent-light); color: var(--accent);
+      font-size: 0.72rem; font-weight: 500; margin-bottom: 0.5rem;
+    }
+    .anchor-tag .remove-anchor {
+      cursor: pointer; margin-left: 0.2rem; opacity: 0.6;
+    }
+    .anchor-tag .remove-anchor:hover { opacity: 1 }
+
+    /* ---- EXPORT PANEL ---- */
+    .export-preview {
+      border-top: 1px solid var(--border-light);
+      padding: 0; background: #fff;
+    }
+    .export-toggle {
+      padding: 0.6rem 1rem; cursor: pointer;
+      font-size: 0.78rem; color: var(--text-dim);
+      display: flex; align-items: center; gap: 0.4rem;
+      user-select: none;
+    }
+    .export-toggle:hover { color: var(--text) }
+    .export-body {
+      display: none; padding: 0 0.75rem 0.75rem;
+    }
+    .export-body.visible { display: block }
+    .export-body pre {
+      background: #1a1a2e; color: #e4e4ef;
+      padding: 0.75rem; border-radius: 8px;
+      font-family: var(--mono); font-size: 0.72rem;
+      line-height: 1.5; overflow-x: auto; max-height: 200px;
+    }
+
+    /* ---- TOAST ---- */
+    .toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      padding: 0.6rem 1.25rem; border-radius: 8px;
+      background: #1a1a2e; color: #e4e4ef;
+      font-size: 0.82rem; box-shadow: var(--shadow-lg);
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    .toast.visible { transform: translateY(0); opacity: 1 }
+
+    /* ---- BACK LINK ---- */
+    .back-link {
+      position: fixed; top: 10px; right: 12px; z-index: 20;
+      font-size: 0.72rem; color: var(--text-faint);
+    }
+    .back-link:hover { color: var(--accent) }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none }
+      .comment-panel { width: 260px; min-width: 260px }
+    }
+    @media (max-width: 640px) {
+      .comment-panel { display: none }
+    }
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-brand">Revi</span>
+      <span class="topbar-sep"></span>
+      <span class="topbar-title" id="current-view-title">Sprint 1 — System Design</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-badge">Demo Mode</span>
+      <div class="lang-toggle">
+        <button class="topbar-btn active" onclick="setLang('en')">EN</button>
+        <button class="topbar-btn" onclick="setLang('zh')">中文</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-area">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search items..." id="search-input">
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">Plans <span>▾</span></div>
+        <div class="sidebar-item active" data-view="plan" data-id="sprint-1" onclick="switchItem(this)">
+          Sprint 1 Design <span class="badge">3</span>
+        </div>
+        <div class="sidebar-item" data-view="plan" data-id="api-spec" onclick="switchItem(this)">
+          API Specification <span class="badge zero">0</span>
+        </div>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">Designs <span>▾</span></div>
+        <div class="sidebar-item" data-view="design" data-id="ui-mockup" onclick="switchItem(this)">
+          UI Mockup v2 <span class="badge">2</span>
+        </div>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">Prototypes <span>▾</span></div>
+        <div class="sidebar-item" data-view="proto" data-id="review-flow" onclick="switchItem(this)">
+          Review Flow <span class="badge">1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- PLAN VIEWER (default) -->
+      <div class="content-main" id="plan-viewer">
+        <div class="md-content">
+          <h1>Sprint 1 — System Design</h1>
+
+          <h2 id="sec-overview">Overview</h2>
+          <p>Revi is a review tool that bridges human reviewers and AI agents. The system consists of a Vue 3 single-page application for human interaction and a REST API backend that both the frontend and AI agents consume.</p>
+          <p>The primary goal is to enable <strong>anchored feedback</strong> — comments that are pinned to specific locations within plans, designs, and prototypes — so agents can programmatically read, act on, and resolve feedback.</p>
+
+          <h2 id="sec-architecture">Architecture</h2>
+          <p>The backend is available in two implementations: a production-ready Rust binary using Axum, and a Python FastAPI reference implementation. Both expose the same REST API surface.</p>
+          <pre>┌──────────────┐     REST API      ┌────────────────────────┐
+│  Vue 3 SPA   │ ←───────────────→ │  Backend (Rust/Python) │
+└──────────────┘                   └────────────────────────┘
+                                              ↕
+┌──────────────┐     /api/export   ┌────────────────────────┐
+│   AI Agent   │ ←───────────────→ │  workspace/ + data/    │
+└──────────────┘                   └────────────────────────┘</pre>
+
+          <h2 id="sec-storage">Storage Layer</h2>
+          <p>Comments are stored as JSON files on disk. Each item gets a comment file at <code>data/comments/{subfolder}__{stem}.json</code>. Archived batches go into <code>data/archive/{subfolder}__{stem}.json</code>.</p>
+          <p>This file-system approach keeps the tool portable — no database setup required. The trade-off is that concurrent writes from multiple processes could conflict, but in practice Revi runs single-process.</p>
+
+          <h2 id="sec-api">API Endpoints</h2>
+          <p>The REST API follows standard conventions. All responses use camelCase field names. The agent export endpoint at <code>/api/export/{item_id}</code> returns only open comments with their anchor references, making it efficient for LLM consumption.</p>
+          <ul>
+            <li><code>GET /api/reviews</code> — list all items</li>
+            <li><code>GET /api/export/{item_id}</code> — agent export</li>
+            <li><code>POST /api/comments/{item_id}</code> — add comment</li>
+            <li><code>PATCH /api/comments/{item_id}/{id}/resolve</code> — resolve</li>
+          </ul>
+
+          <h2 id="sec-frontend">Frontend Design</h2>
+          <p>The Vue 3 SPA uses a split-pane layout. The left sidebar lists workspace items grouped by type. The center pane shows the content viewer (markdown, image, or prototype), and the right panel contains the comment thread.</p>
+          <p>Comments support hover-linking — hovering a comment card highlights the referenced section, quote, or annotation pin in the content viewer. This bidirectional link makes it easy to see exactly what each comment refers to.</p>
+
+          <h3>Technology Choices</h3>
+          <ul>
+            <li>Vue 3 Composition API with Vue Router and Vue I18n</li>
+            <li>Vite for development and builds</li>
+            <li>Vitest for unit tests, Playwright for E2E</li>
+            <li>No component library — custom lightweight styles</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- DESIGN VIEWER -->
+      <div class="design-viewer" id="design-viewer">
+        <div class="design-canvas">
+          <div class="design-frame" style="top:20px;left:20px;width:260px;height:160px"></div>
+          <div class="design-frame" style="top:20px;left:300px;width:280px;height:360px"></div>
+          <div class="design-frame" style="top:200px;left:20px;width:260px;height:180px"></div>
+
+          <div class="annotation-pin" data-pin="1" style="top:60px;left:80px" onmouseenter="highlightPin(1)" onmouseleave="unhighlightPin(1)">1</div>
+          <div class="annotation-pin" data-pin="2" style="top:140px;left:430px" onmouseenter="highlightPin(2)" onmouseleave="unhighlightPin(2)">2</div>
+          <div class="annotation-pin" data-pin="3" style="top:270px;left:100px" onmouseenter="highlightPin(3)" onmouseleave="unhighlightPin(3)">3</div>
+          <div class="annotation-pin" data-pin="4" style="top:300px;left:470px" onmouseenter="highlightPin(4)" onmouseleave="unhighlightPin(4)">4</div>
+
+          <div class="design-legend">
+            <div class="legend-item"><div class="legend-dot">1</div> Sidebar Navigation</div>
+            <div class="legend-item"><div class="legend-dot">2</div> Content Viewer</div>
+            <div class="legend-item"><div class="legend-dot">3</div> Comment Panel</div>
+            <div class="legend-item"><div class="legend-dot">4</div> Export Preview</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROTOTYPE VIEWER -->
+      <div class="proto-viewer" id="proto-viewer">
+        <div style="display:flex;flex:1;overflow:hidden">
+          <div class="proto-steps">
+            <div class="proto-step-item active" data-step="0" onclick="setProtoStep(0)">
+              Step 1 — List items <span class="step-comment-btn">💬</span>
+            </div>
+            <div class="proto-step-item" data-step="1" onclick="setProtoStep(1)">
+              Step 2 — Open review <span class="step-comment-btn">💬</span>
+            </div>
+            <div class="proto-step-item" data-step="2" onclick="setProtoStep(2)">
+              Step 3 — Add comment <span class="step-comment-btn">💬</span>
+            </div>
+            <div class="proto-step-item" data-step="3" onclick="setProtoStep(3)">
+              Step 4 — Resolve <span class="step-comment-btn">💬</span>
+            </div>
+          </div>
+          <div class="proto-frame-area">
+            <div class="proto-frame" id="proto-frame-content">
+              <h3 id="proto-title">Step 1 — Browse review items</h3>
+              <p id="proto-desc">The sidebar lists all plans, designs, and prototypes</p>
+            </div>
+          </div>
+        </div>
+        <div class="proto-nav">
+          <button onclick="prevProtoStep()">← Back</button>
+          <button class="primary" onclick="nextProtoStep()">Next →</button>
+        </div>
+      </div>
+
+      <!-- COMMENT PANEL -->
+      <div class="comment-panel">
+        <div class="comment-form" id="comment-form">
+          <div id="anchor-display"></div>
+          <div class="form-row">
+            <label>Author</label>
+            <input type="text" id="form-author" placeholder="Your name" value="Demo User">
+          </div>
+          <div class="form-row">
+            <label>Comment</label>
+            <textarea id="form-content" placeholder="Your feedback..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="cancel-btn" onclick="toggleForm(false)">Cancel</button>
+            <button class="submit-btn" onclick="submitComment()">Submit</button>
+          </div>
+        </div>
+
+        <div class="comment-header">
+          <div class="comment-tabs">
+            <div class="comment-tab active" data-tab="open" onclick="switchTab('open')">
+              Open <span class="tab-count" id="open-count">3</span>
+            </div>
+            <div class="comment-tab" data-tab="resolved" onclick="switchTab('resolved')">
+              Resolved <span class="tab-count" id="resolved-count">1</span>
+            </div>
+          </div>
+          <button class="add-comment-btn" onclick="toggleForm(true)">+ Add Comment</button>
+        </div>
+
+        <div class="comment-list" id="comment-list"></div>
+
+        <div class="export-preview">
+          <div class="export-toggle" onclick="toggleExport()">
+            <span id="export-arrow">▸</span> Agent Export Preview
+          </div>
+          <div class="export-body" id="export-body">
+            <pre id="export-json"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a href="../" class="back-link">← Back to Revi site</a>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ITEMS = {
+  'sprint-1': {
+    title: 'Sprint 1 — System Design',
+    type: 'plan',
+    view: 'plan',
+    comments: [
+      { id: 'c1', author: 'Alice', content: 'The storage layer should consider SQLite for concurrent access instead of raw JSON files.', reference: { type: 'section', value: '## Storage Layer' }, status: 'open', createdAt: '2026-03-28T08:00:00Z' },
+      { id: 'c2', author: 'Bob', content: '"file-system approach keeps the tool portable" — this trade-off should be documented more clearly in the ADR.', reference: { type: 'quote', value: 'file-system approach keeps the tool portable' }, status: 'open', createdAt: '2026-03-28T09:15:00Z' },
+      { id: 'c3', author: 'Agent-Review', content: 'The API section is missing error response schemas. Agents need to know which status codes to expect.', reference: { type: 'section', value: '## API Endpoints' }, status: 'open', createdAt: '2026-03-28T10:30:00Z' },
+      { id: 'c4', author: 'Alice', content: 'Good overview — sets the right context for the team.', reference: { type: 'section', value: '## Overview' }, status: 'resolved', createdAt: '2026-03-27T14:00:00Z', resolvedAt: '2026-03-27T16:00:00Z' },
+    ]
+  },
+  'api-spec': {
+    title: 'API Specification',
+    type: 'plan',
+    view: 'plan',
+    comments: []
+  },
+  'ui-mockup': {
+    title: 'UI Mockup v2',
+    type: 'design',
+    view: 'design',
+    comments: [
+      { id: 'd1', author: 'Carol', content: 'The sidebar navigation needs more visual hierarchy between groups.', reference: { type: 'annotation', value: '1', label: 'Sidebar Navigation' }, status: 'open', createdAt: '2026-03-28T11:00:00Z' },
+      { id: 'd2', author: 'Agent-UI', content: 'The export preview panel should have syntax highlighting.', reference: { type: 'annotation', value: '4', label: 'Export Preview' }, status: 'open', createdAt: '2026-03-28T12:00:00Z' },
+    ]
+  },
+  'review-flow': {
+    title: 'Review Flow',
+    type: 'prototype',
+    view: 'proto',
+    comments: [
+      { id: 'p1', author: 'Dave', content: 'The transition between Step 2 and Step 3 should show the comment form sliding in rather than appearing instantly.', reference: { type: 'step', value: 2, label: 'Add comment' }, status: 'open', createdAt: '2026-03-28T13:00:00Z' },
+    ]
+  }
+};
+
+const PROTO_STEPS = [
+  { title: 'Step 1 — Browse review items', desc: 'The sidebar lists all plans, designs, and prototypes' },
+  { title: 'Step 2 — Open a review', desc: 'Click an item to see the split-pane review view' },
+  { title: 'Step 3 — Add a comment', desc: 'Select text or click a pin, then submit feedback' },
+  { title: 'Step 4 — Resolve & archive', desc: 'Mark comments resolved, then archive the batch' },
+];
+
+let currentItemId = 'sprint-1';
+let currentTab = 'open';
+let currentProtoStep = 0;
+
+function switchItem(el) {
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+
+  const view = el.dataset.view;
+  const id = el.dataset.id;
+  currentItemId = id;
+
+  document.getElementById('plan-viewer').style.display = view === 'plan' ? '' : 'none';
+  document.getElementById('design-viewer').classList.toggle('visible', view === 'design');
+  document.getElementById('proto-viewer').classList.toggle('visible', view === 'proto');
+
+  if (view !== 'design') document.getElementById('design-viewer').classList.remove('visible');
+  if (view !== 'proto') document.getElementById('proto-viewer').classList.remove('visible');
+
+  document.getElementById('current-view-title').textContent = ITEMS[id].title;
+  renderComments();
+  updateExport();
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.comment-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  renderComments();
+}
+
+function renderComments() {
+  const item = ITEMS[currentItemId];
+  if (!item) return;
+
+  const open = item.comments.filter(c => c.status === 'open');
+  const resolved = item.comments.filter(c => c.status === 'resolved');
+
+  document.getElementById('open-count').textContent = open.length;
+  document.getElementById('resolved-count').textContent = resolved.length;
+
+  const list = currentTab === 'open' ? open : resolved;
+  const container = document.getElementById('comment-list');
+
+  if (list.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-faint);font-size:0.85rem">' +
+      (currentTab === 'open' ? 'No open comments' : 'No resolved comments') + '</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(c => {
+    const refClass = c.reference ? c.reference.type : 'general';
+    const refLabel = formatRef(c.reference);
+    const time = formatTime(c.createdAt);
+
+    return `<div class="comment-card ${c.status === 'resolved' ? 'resolved' : ''}"
+        onmouseenter="hoverComment('${c.id}')" onmouseleave="unhoverComment('${c.id}')">
+      <div class="comment-card-header">
+        <span class="comment-author">${c.author}</span>
+        <span class="comment-time">${time}</span>
+      </div>
+      ${refLabel ? `<div class="comment-ref ${refClass}">${refLabel}</div>` : ''}
+      <div class="comment-body">${c.content}</div>
+      ${c.status === 'open' ? `<div class="comment-actions">
+        <button class="resolve-btn" onclick="resolveComment('${c.id}')">✓ Mark resolved</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function formatRef(ref) {
+  if (!ref) return '';
+  switch (ref.type) {
+    case 'section': return '§ ' + ref.value;
+    case 'quote': return '" ' + ref.value.substring(0, 50) + (ref.value.length > 50 ? '...' : '') + ' "';
+    case 'annotation': return '📌 Pin ' + ref.value + (ref.label ? ' — ' + ref.label : '');
+    case 'step': return '▶ Step ' + (ref.value + 1) + (ref.label ? ' — ' + ref.label : '');
+    case 'line': return '# Line ' + ref.value;
+    default: return '';
+  }
+}
+
+function formatTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en', { month: 'short', day: 'numeric' }) + ', ' +
+         d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
+}
+
+function resolveComment(id) {
+  const item = ITEMS[currentItemId];
+  const c = item.comments.find(c => c.id === id);
+  if (c) {
+    c.status = 'resolved';
+    c.resolvedAt = new Date().toISOString();
+    renderComments();
+    updateExport();
+    updateBadges();
+    showToast('Comment resolved');
+  }
+}
+
+function toggleForm(show) {
+  document.getElementById('comment-form').classList.toggle('visible', show);
+  if (show) {
+    document.getElementById('form-content').focus();
+  }
+}
+
+function submitComment() {
+  const author = document.getElementById('form-author').value.trim() || 'Anonymous';
+  const content = document.getElementById('form-content').value.trim();
+  if (!content) return;
+
+  const item = ITEMS[currentItemId];
+  item.comments.push({
+    id: 'c' + Date.now(),
+    author,
+    content,
+    reference: { type: 'general', value: null },
+    status: 'open',
+    createdAt: new Date().toISOString()
+  });
+
+  document.getElementById('form-content').value = '';
+  toggleForm(false);
+  switchTab('open');
+  renderComments();
+  updateExport();
+  updateBadges();
+  showToast('Comment added');
+}
+
+function updateBadges() {
+  document.querySelectorAll('.sidebar-item').forEach(el => {
+    const id = el.dataset.id;
+    const item = ITEMS[id];
+    if (!item) return;
+    const open = item.comments.filter(c => c.status === 'open').length;
+    const badge = el.querySelector('.badge');
+    badge.textContent = open;
+    badge.classList.toggle('zero', open === 0);
+  });
+}
+
+function hoverComment(id) {
+  const item = ITEMS[currentItemId];
+  const c = item.comments.find(c => c.id === id);
+  if (!c || !c.reference) return;
+
+  if (c.reference.type === 'section' && item.view === 'plan') {
+    const secId = 'sec-' + c.reference.value.replace('## ', '').toLowerCase().replace(/\s+/g, '-');
+    const el = document.getElementById(secId);
+    if (el) {
+      el.classList.add('highlight-section');
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+  if (c.reference.type === 'quote') {
+    document.querySelectorAll('.md-content p').forEach(p => {
+      if (p.textContent.includes(c.reference.value)) {
+        const html = p.innerHTML.replace(c.reference.value,
+          '<span class="highlight-quote">' + c.reference.value + '</span>');
+        p.innerHTML = html;
+      }
+    });
+  }
+  if (c.reference.type === 'annotation') {
+    const pin = document.querySelector(`.annotation-pin[data-pin="${c.reference.value}"]`);
+    if (pin) pin.classList.add('highlight');
+  }
+}
+
+function unhoverComment(id) {
+  document.querySelectorAll('.highlight-section').forEach(el => el.classList.remove('highlight-section'));
+  document.querySelectorAll('.highlight-quote').forEach(el => {
+    el.outerHTML = el.textContent;
+  });
+  document.querySelectorAll('.annotation-pin.highlight').forEach(el => el.classList.remove('highlight'));
+}
+
+function highlightPin(n) {
+  const card = document.querySelector(`.comment-card:nth-child(${n})`);
+}
+function unhighlightPin(n) {}
+
+function setProtoStep(n) {
+  currentProtoStep = n;
+  document.querySelectorAll('.proto-step-item').forEach((el, i) => {
+    el.classList.toggle('active', i === n);
+  });
+  document.getElementById('proto-title').textContent = PROTO_STEPS[n].title;
+  document.getElementById('proto-desc').textContent = PROTO_STEPS[n].desc;
+}
+function nextProtoStep() { if (currentProtoStep < PROTO_STEPS.length - 1) setProtoStep(currentProtoStep + 1) }
+function prevProtoStep() { if (currentProtoStep > 0) setProtoStep(currentProtoStep - 1) }
+
+function updateExport() {
+  const item = ITEMS[currentItemId];
+  const open = item.comments.filter(c => c.status === 'open');
+  const json = {
+    schemaVersion: '1.0',
+    item: { id: item.type + 's/' + currentItemId, type: item.type, title: item.title },
+    summary: { total: item.comments.length, open: open.length, resolved: item.comments.length - open.length },
+    openComments: open.map(c => ({
+      id: c.id, author: c.author, content: c.content,
+      reference: c.reference, createdAt: c.createdAt
+    })),
+    exportedAt: new Date().toISOString()
+  };
+  document.getElementById('export-json').textContent = JSON.stringify(json, null, 2);
+}
+
+function toggleExport() {
+  const body = document.getElementById('export-body');
+  const arrow = document.getElementById('export-arrow');
+  body.classList.toggle('visible');
+  arrow.textContent = body.classList.contains('visible') ? '▾' : '▸';
+}
+
+function setLang(lang) {
+  document.querySelectorAll('.lang-toggle .topbar-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', (lang === 'en' && i === 0) || (lang === 'zh' && i === 1));
+  });
+  showToast(lang === 'en' ? 'Language: English' : '语言：中文');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), 2000);
+}
+
+document.getElementById('search-input').addEventListener('input', function(e) {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('.sidebar-item').forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+
+renderComments();
+updateExport();
+</script>
+</body>
+</html>
