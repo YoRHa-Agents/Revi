@@ -1,17 +1,13 @@
 <p align="center">
-  <strong>R e v i</strong>
+  <img src="site/assets/banner.svg" alt="Revi — YoRHa Review Division" width="640">
 </p>
 
 <p align="center">
-  <em>Agent-human review tool for plans, designs, and prototypes</em>
-</p>
-
-<p align="center">
-  <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/Rust-1.75+-dea584?logo=rust&logoColor=white" alt="Rust"></a>
-  <a href="https://vuejs.org"><img src="https://img.shields.io/badge/Vue-3.4-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3"></a>
-  <a href="https://www.python.org"><img src="https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white" alt="Python"></a>
-  <a href="https://yorha-agents.github.io/Revi/"><img src="https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=github" alt="Docs"></a>
-  <a href="https://yorha-agents.github.io/Revi/demo/"><img src="https://img.shields.io/badge/demo-live-brightgreen" alt="Demo"></a>
+  <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/Rust-1.75+-454138?style=flat&logo=rust&logoColor=DAD4BB&labelColor=454138" alt="Rust"></a>
+  <a href="https://vuejs.org"><img src="https://img.shields.io/badge/Vue-3.4-454138?style=flat&logo=vuedotjs&logoColor=DAD4BB&labelColor=454138" alt="Vue 3"></a>
+  <a href="https://www.python.org"><img src="https://img.shields.io/badge/Python-3.11+-454138?style=flat&logo=python&logoColor=DAD4BB&labelColor=454138" alt="Python"></a>
+  <a href="https://yorha-agents.github.io/Revi/"><img src="https://img.shields.io/badge/site-GitHub%20Pages-C2572B?style=flat&labelColor=454138" alt="Site"></a>
+  <a href="https://yorha-agents.github.io/Revi/demo/"><img src="https://img.shields.io/badge/demo-interactive-C2572B?style=flat&labelColor=454138" alt="Demo"></a>
 </p>
 
 ---
@@ -19,21 +15,44 @@
 Revi bridges the gap between human reviewers and AI agents. Reviewers browse markdown plans, design mockups, and interactive HTML prototypes in a split-pane UI, leaving **anchored comments** pinned to specific headings, text selections, image annotation pins, or prototype steps. Agents consume a structured JSON export at `/api/export/{item_id}` that surfaces only open feedback with anchor references — read, act, resolve, repeat.
 
 <p align="center">
-  <a href="https://yorha-agents.github.io/Revi/demo/">Try the interactive demo →</a>
+  <a href="https://yorha-agents.github.io/Revi/demo/"><em>Try the interactive demo →</em></a>
 </p>
+
+---
+
+## Preview
+
+<p align="center">
+  <img src="site/assets/preview-demo.svg" alt="Revi — Three review modes" width="720">
+</p>
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="site/assets/preview-plan.svg" alt="Plan Review">
+    </td>
+    <td width="50%">
+      <img src="site/assets/preview-design.svg" alt="Design Review">
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><em>Plan Review — markdown with anchored comments</em></td>
+    <td align="center"><em>Design Review — canvas with annotation pins</em></td>
+  </tr>
+</table>
+
+---
 
 ## Features
 
 | | Feature | Description |
 |---|---------|-------------|
-| **📄** | **Plan Review** | Render markdown with heading anchors, text selection comments, inline search, and collapsible document index |
-| **🎨** | **Design Review** | Display images on a dark canvas with numbered annotation pins and hover-linked comment cards |
-| **🖥️** | **Prototype Review** | Step-through interactive HTML prototypes with per-step commenting and zoom/pan support |
-| **🤖** | **Agent Export API** | `GET /api/export/{item_id}` returns only open comments as structured JSON — purpose-built for LLM agents |
-| **💬** | **Anchored Comments** | Six reference types: `section`, `quote`, `line`, `annotation`, `step`, `general` |
-| **📦** | **Archive Workflow** | Batch-archive resolved comments to keep the workspace clean across review rounds |
-| **🌐** | **Bilingual UI** | English and Chinese with one-click toggle |
-| **⚡** | **Zero-dependency binary** | Single static Rust binary — no runtime, no containers, just run it |
+| I | **Plan Review** | Render markdown with heading anchors, text selection comments, inline search, and collapsible document index |
+| II | **Design Review** | Display images on a dark canvas with numbered annotation pins and hover-linked comment cards |
+| III | **Prototype Review** | Step-through interactive HTML prototypes with per-step commenting and zoom/pan support |
+| IV | **Agent Export API** | `GET /api/export/{item_id}` returns only open comments as structured JSON — purpose-built for LLM agents |
+| V | **Anchored Comments** | Six reference types: `section`, `quote`, `line`, `annotation`, `step`, `general` |
+| VI | **Zero-Dependency Binary** | Single static Rust binary — no runtime, no containers, just run it |
 
 ## Quick Start
 
@@ -65,8 +84,6 @@ cd frontend && npm install && npm run dev
 ```
 
 ### Configuration
-
-CLI flags, config file, or defaults — pick your style:
 
 ```bash
 ./revi --workspace /my/docs --data /my/data --port 9000
@@ -135,8 +152,6 @@ The `item_id` format is `{subfolder}/{stem}` — e.g. `plans/sprint-1-design`, `
 | `GET` | `/api/config` | View server config |
 | `PATCH` | `/api/config` | Update config |
 
-Full API docs: [`docs/agent-guide.md`](docs/agent-guide.md) · User guide: [`docs/user-guide.md`](docs/user-guide.md)
-
 ## Workspace Structure
 
 Drop files into the right subfolder — Revi auto-discovers them by type:
@@ -147,6 +162,15 @@ workspace/
   designs/      →  Images displayed with annotation pins
   prototypes/   →  HTML files shown as step-through viewers
 ```
+
+## Guides
+
+| Guide | Description |
+|-------|-------------|
+| [User Guide](docs/user-guide.md) | UI walkthrough for human reviewers — workspace setup, navigation, commenting, archiving |
+| [Agent API Guide](docs/agent-guide.md) | Full endpoint reference, schemas, reference types, and polling strategies for AI agents |
+| [Deploy Pages](docs/deploy-pages.md) | Step-by-step guide to deploying the GitHub Pages landing site and demo |
+| [Load Testing](docs/load-test.md) | Locust-based performance testing — smoke, normal, peak, and soak scenarios |
 
 ## Development
 
@@ -185,19 +209,13 @@ npm run test:e2e     # Playwright E2E tests
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Vue 3 + Vue Router + Vue I18n + Vite |
+| Frontend | Vue 3 · Vue Router · Vue I18n · Vite |
 | Backend (primary) | Rust · Axum · Tokio · Serde |
 | Backend (reference) | Python · FastAPI · Pydantic |
 | Testing | Vitest · Playwright · Cargo test · Locust |
 
-## Documentation
-
-- [User Guide](docs/user-guide.md) — UI walkthrough for human reviewers
-- [Agent API Guide](docs/agent-guide.md) — Full endpoint reference for AI agents
-- [Load Testing](docs/load-test.md) — Locust-based performance testing
-
 ---
 
 <p align="center">
-  Built for the loop: humans review, agents revise.
+  <em>Humans review. Agents revise.</em>
 </p>

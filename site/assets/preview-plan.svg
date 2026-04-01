@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" width="720" height="420">
+  <defs>
+    <style>
+      .frame { fill: #DAD4BB; stroke: #9E9A8D; stroke-width: 1; }
+      .frame-dark { fill: #D0C9AE; stroke: #9E9A8D; stroke-width: 0.75; }
+      .frame-header { fill: #CEC7AC; stroke: #9E9A8D; stroke-width: 0.75; }
+      .tt { font-family: Georgia, serif; font-size: 11px; fill: #454138; letter-spacing: 0.15em; font-weight: 500; }
+      .tb { font-family: Georgia, serif; font-size: 10px; fill: #5C5847; }
+      .td { font-family: Georgia, serif; font-size: 9px; fill: #9E9A8D; }
+      .tm { font-family: monospace; font-size: 8px; fill: #D0C9AE; }
+      .th { font-family: Georgia, serif; font-size: 13px; fill: #454138; letter-spacing: 0.08em; }
+      .ts { font-family: Georgia, serif; font-size: 8.5px; fill: #5C5847; }
+      .tl { font-family: Georgia, serif; font-size: 7px; fill: #9E9A8D; letter-spacing: 0.1em; }
+      .al { stroke: #C2572B; stroke-width: 1.5; }
+      .cb { fill: #2A2822; }
+      .bg { fill: #C2572B; }
+      .bt { font-family: Georgia, serif; font-size: 7px; fill: #DAD4BB; }
+      .cc { fill: #E2DCCA; stroke: #BAB5A1; stroke-width: 0.5; }
+      .sl { stroke: #BAB5A1; stroke-width: 0.5; }
+      .rf { font-family: Georgia, serif; font-size: 7px; fill: #C2572B; }
+      .rq { font-family: Georgia, serif; font-size: 7px; fill: #8A7A32; }
+    </style>
+  </defs>
+  <rect class="frame" x="0" y="0" width="720" height="420" rx="3"/>
+  <rect class="frame-header" x="0" y="0" width="720" height="32" rx="3"/>
+  <rect fill="#CEC7AC" x="0" y="20" width="720" height="12"/>
+  <line class="sl" x1="0" y1="32" x2="720" y2="32"/>
+  <text class="tt" x="16" y="21">REVI</text>
+  <line x1="52" y1="10" x2="52" y2="24" stroke="#BAB5A1" stroke-width="0.5"/>
+  <text class="tb" x="62" y="21">Sprint 1 - System Design</text>
+  <text class="td" x="650" y="21">EN</text>
+  <rect class="frame-dark" x="0" y="32" width="150" height="388"/>
+  <line class="sl" x1="150" y1="32" x2="150" y2="420"/>
+  <rect fill="#C8C1A6" x="10" y="42" width="130" height="22" rx="3"/>
+  <text class="td" x="20" y="57">Search items...</text>
+  <text class="tl" x="14" y="84">PLANS</text>
+  <line class="al" x1="0" y1="90" x2="0" y2="116"/>
+  <rect fill="rgba(194,87,43,0.06)" x="0" y="90" width="150" height="26"/>
+  <text class="tb" x="14" y="107" font-weight="500">Sprint 1 Design</text>
+  <circle class="bg" cx="132" cy="103" r="7"/>
+  <text class="bt" x="132" y="106" text-anchor="middle">3</text>
+  <text class="ts" x="14" y="130">API Specification</text>
+  <circle fill="#BAB5A1" cx="132" cy="127" r="7"/>
+  <text class="bt" x="132" y="130" text-anchor="middle">0</text>
+  <text class="tl" x="14" y="156">DESIGNS</text>
+  <text class="ts" x="14" y="174">UI Mockup v2</text>
+  <circle class="bg" cx="132" cy="171" r="7"/>
+  <text class="bt" x="132" y="174" text-anchor="middle">2</text>
+  <text class="tl" x="14" y="200">PROTOTYPES</text>
+  <text class="ts" x="14" y="218">Review Flow</text>
+  <circle class="bg" cx="132" cy="215" r="7"/>
+  <text class="bt" x="132" y="218" text-anchor="middle">1</text>
+  <rect fill="#DAD4BB" x="150" y="32" width="370" height="388"/>
+  <text class="th" x="174" y="66" font-size="16">Sprint 1 - System Design</text>
+  <line class="sl" x1="174" y1="74" x2="490" y2="74"/>
+  <text class="th" x="174" y="100">Overview</text>
+  <line class="sl" x1="174" y1="106" x2="490" y2="106"/>
+  <text class="ts" x="174" y="120">Revi is a review tool that bridges human reviewers</text>
+  <text class="ts" x="174" y="132">and AI agents. The system consists of a Vue 3 SPA</text>
+  <text class="ts" x="174" y="144">for human interaction and a REST API backend.</text>
+  <text class="th" x="174" y="172">Architecture</text>
+  <line class="sl" x1="174" y1="178" x2="490" y2="178"/>
+  <text class="ts" x="174" y="192">The backend is available in two implementations:</text>
+  <text class="ts" x="174" y="204">a production Rust binary and a Python reference.</text>
+  <rect class="cb" x="174" y="216" width="310" height="60" rx="3"/>
+  <text class="tm" x="184" y="232">Vue 3 SPA  &lt;--&gt;  Backend (Rust)</text>
+  <text class="tm" x="184" y="246">                      |</text>
+  <text class="tm" x="184" y="260">AI Agent   &lt;--&gt;  workspace/ + data/</text>
+  <text class="th" x="174" y="300">Storage Layer</text>
+  <line class="sl" x1="174" y1="306" x2="490" y2="306"/>
+  <text class="ts" x="174" y="320">Comments are stored as JSON files on disk.</text>
+  <text class="ts" x="174" y="332">Each item gets a comment file at data/comments/.</text>
+  <text class="th" x="174" y="360">API Endpoints</text>
+  <line class="sl" x1="174" y1="366" x2="490" y2="366"/>
+  <text class="ts" x="174" y="380">The REST API follows standard conventions.</text>
+  <text class="ts" x="174" y="392">All responses use camelCase field names.</text>
+  <rect fill="#E2DCCA" x="520" y="32" width="200" height="388"/>
+  <line class="sl" x1="520" y1="32" x2="520" y2="420"/>
+  <rect fill="#D8D1B8" x="520" y="32" width="200" height="32"/>
+  <text class="ts" x="534" y="52" font-weight="500">Open (3)</text>
+  <text class="td" x="590" y="52">Resolved (1)</text>
+  <line class="sl" x1="520" y1="64" x2="720" y2="64"/>
+  <rect class="cc" x="530" y="74" width="180" height="70" rx="3"/>
+  <line x1="530" y1="74" x2="530" y2="144" stroke="#C2572B" stroke-width="2"/>
+  <text class="ts" x="540" y="89" font-weight="500">Alice</text>
+  <text class="td" x="660" y="89">Mar 28</text>
+  <rect fill="rgba(194,87,43,0.1)" x="540" y="94" width="80" height="14" rx="2"/>
+  <text class="rf" x="546" y="104">S: Storage Layer</text>
+  <text class="ts" x="540" y="122">Consider SQLite for</text>
+  <text class="ts" x="540" y="134">concurrent access...</text>
+  <rect class="cc" x="530" y="154" width="180" height="70" rx="3"/>
+  <line x1="530" y1="154" x2="530" y2="224" stroke="#C2572B" stroke-width="2"/>
+  <text class="ts" x="540" y="169" font-weight="500">Bob</text>
+  <text class="td" x="660" y="169">Mar 28</text>
+  <rect fill="rgba(180,160,80,0.12)" x="540" y="174" width="120" height="14" rx="2"/>
+  <text class="rq" x="546" y="184">"file-system approach..."</text>
+  <text class="ts" x="540" y="202">This trade-off should be</text>
+  <text class="ts" x="540" y="214">documented in the ADR.</text>
+  <rect class="cc" x="530" y="234" width="180" height="70" rx="3"/>
+  <line x1="530" y1="234" x2="530" y2="304" stroke="#C2572B" stroke-width="2"/>
+  <text class="ts" x="540" y="249" font-weight="500">Agent-Review</text>
+  <text class="td" x="660" y="249">Mar 28</text>
+  <rect fill="rgba(194,87,43,0.1)" x="540" y="254" width="80" height="14" rx="2"/>
+  <text class="rf" x="546" y="264">S: API Endpoints</text>
+  <text class="ts" x="540" y="282">Missing error response</text>
+  <text class="ts" x="540" y="294">schemas for agents.</text>
+  <rect fill="#D0C9AE" x="520" y="388" width="200" height="32"/>
+  <line class="sl" x1="520" y1="388" x2="720" y2="388"/>
+  <text class="td" x="534" y="408">&gt; Agent Export Preview</text>
+  <text class="td" x="360" y="414" text-anchor="middle">Plan Review - Markdown with anchored comments</text>
+</svg>
