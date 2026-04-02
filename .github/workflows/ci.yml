@@ -1,0 +1,53 @@
+name: Revi CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  rust-and-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Rust tests
+        run: cargo test --manifest-path server/Cargo.toml
+
+      - name: Common core tests
+        run: cargo test --manifest-path common/core/Cargo.toml
+
+      - name: Common adapter tests
+        run: cargo test --manifest-path common/adapters/Cargo.toml
+
+      - name: Common CLI tests
+        run: cargo test --manifest-path common/cli/Cargo.toml
+
+      - name: Frontend install
+        run: npm ci
+        working-directory: frontend
+
+      - name: Frontend unit tests
+        run: npm test
+        working-directory: frontend
+
+      - name: Playwright browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: frontend
+
+      - name: Frontend end-to-end tests
+        run: npm run test:e2e
+        working-directory: frontend
+
+      - name: Rust and Vue validation
+        run: bash scripts/validate-rust-vue.sh

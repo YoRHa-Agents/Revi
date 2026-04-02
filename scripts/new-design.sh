@@ -8,8 +8,9 @@ if [[ $# -ne 1 ]]; then
 fi
 
 SLUG="$1"
-WORKSPACE_DIR="${REVI_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)/backend/workspace}"
+WORKSPACE_DIR="${REVI_WORKSPACE:-${HOME:-$(cd "$(dirname "$0")/.." && pwd)}/.revi/workspace}"
 DEST="${WORKSPACE_DIR}/designs/${SLUG}.svg"
+mkdir -p "$(dirname "$DEST")"
 
 if [[ -f "$DEST" ]]; then
   echo "Error: $DEST already exists" >&2

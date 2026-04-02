@@ -1,0 +1,20 @@
+[package]
+name = "common_cli"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+common_adapters = { path = "../adapters" }
+common_core = { path = "../core" }
+revi_server = { package = "revi-server", path = "../../server/crates/revi-server" }
+
+[dev-dependencies]
+serde_json = "1"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "common"
+path = "src/main.rs"

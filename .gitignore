@@ -13,7 +13,13 @@ node_modules/
 
 # Rust
 server/target/
+common/*/target/
+/release/
 
 # Frontend build output & test artifacts
 frontend/dist/
 frontend/test-results/
+
+# Generated runtime and local validation artifacts
+.tmp-e2e/
+dist/revi-local

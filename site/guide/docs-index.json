@@ -1,0 +1,87 @@
+{
+  "docs_nodes": [
+    {
+      "node_id": "readme",
+      "title": "README",
+      "kind": "Index",
+      "path": "README.md",
+      "audience": "Human",
+      "children": [
+        "docs-index"
+      ]
+    },
+    {
+      "node_id": "agents",
+      "title": "AGENTS",
+      "kind": "Guide",
+      "path": "AGENTS.md",
+      "audience": "MainAgent",
+      "children": [
+        "docs-index"
+      ]
+    },
+    {
+      "node_id": "docs-index",
+      "title": "Docs Index",
+      "kind": "Index",
+      "path": "docs/index.md",
+      "audience": "Subagent",
+      "children": [
+        "dev-guide",
+        "release-guide",
+        "user-guide",
+        "agent-guide",
+        "deploy-pages",
+        "load-test"
+      ]
+    },
+    {
+      "node_id": "dev-guide",
+      "title": "Development Guide",
+      "kind": "Guide",
+      "path": "docs/guides/dev.md",
+      "audience": "MainAgent",
+      "children": []
+    },
+    {
+      "node_id": "release-guide",
+      "title": "Release Guide",
+      "kind": "Guide",
+      "path": "docs/guides/release.md",
+      "audience": "MainAgent",
+      "children": []
+    },
+    {
+      "node_id": "user-guide",
+      "title": "User Guide",
+      "kind": "Guide",
+      "path": "docs/user-guide.md",
+      "audience": "Human",
+      "children": []
+    },
+    {
+      "node_id": "agent-guide",
+      "title": "Agent Guide",
+      "kind": "Api",
+      "path": "docs/agent-guide.md",
+      "audience": "Subagent",
+      "children": []
+    },
+    {
+      "node_id": "deploy-pages",
+      "title": "Deploy Pages",
+      "kind": "Guide",
+      "path": "docs/deploy-pages.md",
+      "audience": "MainAgent",
+      "children": []
+    },
+    {
+      "node_id": "load-test",
+      "title": "Load Testing",
+      "kind": "Guide",
+      "path": "docs/load-test.md",
+      "audience": "Subagent",
+      "children": []
+    }
+  ]
+}

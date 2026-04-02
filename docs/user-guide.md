@@ -8,12 +8,12 @@ If you want the styled web version, open [the live guide](https://yorha-agents.g
 
 ## Workspace Setup
 
-Revi auto-discovers files from the `backend/workspace/` directory. Drop files into the appropriate subfolder and they will appear in the sidebar automatically on next server start (or immediately if using the upload API).
+Revi auto-discovers files from the active Rust server workspace, which defaults to `~/.revi/workspace/`. Drop files into the appropriate subfolder and they will appear in the sidebar automatically on next server start (or immediately if using the upload API).
 
 ### Folder structure
 
 ```
-backend/workspace/
+~/.revi/workspace/
   plans/          ← Markdown documents (.md)
   designs/        ← Image files (.png, .jpg, .gif, .webp, .svg)
   prototypes/     ← Interactive HTML files (.html)
@@ -41,11 +41,12 @@ File names become the item's display title via title-casing, so use descriptive 
 ### Via the API
 
 ```bash
-curl -X POST http://localhost:8000/api/upload/plans \
+curl -X POST http://localhost:8000/api/upload \
   -F "file=@my-plan.md"
 ```
 
-Use `plans`, `designs`, or `prototypes` as the subfolder in the path.
+The Rust server infers the target subfolder from the file extension. If needed,
+you can also add `-F "type=plan"` / `design` / `prototype` as an override.
 
 ### Via drag-and-drop (future)
 

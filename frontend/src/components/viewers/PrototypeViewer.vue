@@ -8,12 +8,16 @@
       </div>
 
       <div class="steps-list">
-        <button
+        <div
           v-for="(step, i) in steps"
           :key="i"
           class="step-item"
           :class="{ active: current === i, done: current > i, hovered: isHoveredStep(i) }"
+          role="button"
+          tabindex="0"
           @click="current = i"
+          @keydown.enter="current = i"
+          @keydown.space.prevent="current = i"
         >
           <div class="step-circle">
             <span v-if="current > i" class="step-check">✓</span>
@@ -24,7 +28,7 @@
             <div class="step-role">{{ step.role }}</div>
           </div>
           <button class="step-anchor-btn" @click.stop="emitStepAnchor(i)" title="Comment on this step">💬</button>
-        </button>
+        </div>
       </div>
 
       <div class="nav-btns">

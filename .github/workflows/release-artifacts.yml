@@ -1,0 +1,120 @@
+name: Build Release Artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target-platform: linux-x86_64
+            rust-target: x86_64-unknown-linux-musl
+            install-zigbuild: true
+          - os: ubuntu-latest
+            target-platform: linux-aarch64
+            rust-target: aarch64-unknown-linux-musl
+            install-zigbuild: true
+          - os: macos-14
+            target-platform: macos-aarch64
+            rust-target: aarch64-apple-darwin
+            install-zigbuild: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-target }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install cargo-zigbuild
+        if: matrix.install-zigbuild
+        run: cargo install cargo-zigbuild
+
+      - name: Frontend install
+        run: npm ci
+        working-directory: frontend
+
+      - name: Run validation
+        run: bash scripts/validate-rust-vue.sh
+
+      - name: Build platform release bundle
+        run: |
+          export REVI_TARGET_PLATFORM="${{ matrix.target-platform }}"
+          export REVI_RELEASE_TAG="${GITHUB_REF_NAME}"
+          bash scripts/build-release.sh
+
+      - name: Upload platform artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: revi-release-${{ matrix.target-platform }}
+          path: |
+            release/revi-${{ matrix.target-platform }}
+            release/SHA256SUMS
+            release/release-manifest-${{ matrix.target-platform }}.json
+
+  publish-release:
+    needs: build-matrix
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: .release-artifacts
+
+      - name: Assemble release payload
+        run: |
+          mkdir -p release
+          find .release-artifacts -type f -name 'revi-*' -exec cp {} release/ \;
+          find .release-artifacts -type f -name 'release-manifest-*.json' -exec cp {} release/ \;
+          find .release-artifacts -type f -name 'SHA256SUMS' -exec cat {} \; | sort -u > release/SHA256SUMS
+          python3 - <<'PY' "${GITHUB_REF_NAME}"
+          import json
+          import sys
+          from pathlib import Path
+          release = Path("release")
+          release_tag = sys.argv[1]
+          manifests = {}
+          for path in sorted(release.glob("release-manifest-*.json")):
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              manifests[payload["platform"]] = {
+                  "asset_name": payload["asset_name"],
+                  "manifest_name": path.name,
+              }
+          index = {
+              "release_repo": "YoRHa-Agents/Revi",
+              "asset_prefix": "revi",
+              "checksum_file": "SHA256SUMS",
+              "release_tag": release_tag,
+              "assets": manifests,
+          }
+          (release / "release-manifest.json").write_text(
+              json.dumps(index, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Publish GitHub Release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/revi-*
+            release/SHA256SUMS
+            release/release-manifest.json
+            release/release-manifest-*.json
