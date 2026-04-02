@@ -47,6 +47,10 @@ jobs:
         if: matrix.install-zigbuild
         run: cargo install cargo-zigbuild
 
+      - name: Setup Zig
+        if: matrix.install-zigbuild
+        uses: goto-bus-stop/setup-zig@v2
+
       - name: Frontend install
         run: npm ci
         working-directory: frontend
