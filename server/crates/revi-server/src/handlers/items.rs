@@ -13,7 +13,8 @@ use crate::{
 
 pub async fn list_reviews(State(s): State<AppState>) -> Result<Json<Vec<ReviewItem>>, AppError> {
     let overrides = s.metadata.load().map_err(AppError::Internal)?;
-    let mut items = s.scanner.scan(&overrides);
+    let scanner = s.scanner.read().unwrap();
+    let mut items = scanner.scan(&overrides);
     for item in &mut items {
         item.open_count = s.comments.open_count(&item.id).unwrap_or(0);
         item.resolved_count = s.comments.resolved_count(&item.id).unwrap_or(0);
@@ -26,8 +27,8 @@ pub async fn get_review(
     Path(item_id): Path<String>,
 ) -> Result<Json<ReviewItemDetail>, AppError> {
     let overrides = s.metadata.load().map_err(AppError::Internal)?;
-    let mut detail = s
-        .scanner
+    let scanner = s.scanner.read().unwrap();
+    let mut detail = scanner
         .get_detail(&item_id, "/workspace", &overrides)
         .ok_or(AppError::NotFound)?;
     detail.open_count = s.comments.open_count(&item_id).unwrap_or(0);
@@ -47,18 +48,20 @@ pub async fn update_review_type(
             body.item_type
         )));
     }
-    let overrides = s.metadata.load().map_err(AppError::Internal)?;
-    if s.scanner.get_item(&item_id, &overrides).is_none() {
-        return Err(AppError::NotFound);
+    {
+        let overrides = s.metadata.load().map_err(AppError::Internal)?;
+        let scanner = s.scanner.read().unwrap();
+        if scanner.get_item(&item_id, &overrides).is_none() {
+            return Err(AppError::NotFound);
+        }
     }
     s.metadata
         .set_type(&item_id, &body.item_type)
         .map_err(AppError::Internal)?;
 
-    // Re-read with updated overrides
     let overrides = s.metadata.load().map_err(AppError::Internal)?;
-    let mut item = s
-        .scanner
+    let scanner = s.scanner.read().unwrap();
+    let mut item = scanner
         .get_item(&item_id, &overrides)
         .ok_or(AppError::NotFound)?;
     item.open_count = s.comments.open_count(&item_id).unwrap_or(0);

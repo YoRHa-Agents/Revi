@@ -1,6 +1,10 @@
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
 use axum::{
+    body::Body,
+    extract::{Path, State},
+    http::{header, StatusCode},
+    response::{IntoResponse, Response},
     routing::{get, post},
     Router,
 };
@@ -19,23 +23,62 @@ use crate::{
 
 #[derive(Clone)]
 pub struct AppState {
-    pub config: Arc<Config>,
+    pub config: Arc<RwLock<Config>>,
     pub comments: Arc<CommentStore>,
     pub archive: Arc<ArchiveStore>,
     pub metadata: Arc<MetadataStore>,
-    pub scanner: Arc<WorkspaceScanner>,
+    pub scanner: Arc<RwLock<WorkspaceScanner>>,
 }
 
 impl AppState {
-    pub fn new(config: Arc<Config>) -> anyhow::Result<Self> {
+    pub fn new(config: Config) -> anyhow::Result<Self> {
+        let scanner = WorkspaceScanner::new(config.effective_workspace());
         Ok(Self {
             comments: Arc::new(CommentStore::new(&config.data_path)?),
             archive: Arc::new(ArchiveStore::new(&config.data_path)?),
             metadata: Arc::new(MetadataStore::new(&config.data_path)),
-            scanner: Arc::new(WorkspaceScanner::new(&config.workspace_path)),
-            config,
+            scanner: Arc::new(RwLock::new(scanner)),
+            config: Arc::new(RwLock::new(config)),
         })
     }
+}
+
+async fn serve_workspace_file(
+    State(s): State<AppState>,
+    Path(path): Path<String>,
+) -> Response {
+    let workspace = {
+        let cfg = s.config.read().unwrap();
+        cfg.effective_workspace()
+    };
+    let file_path = workspace.join(&path);
+
+    let file_path = match file_path.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return StatusCode::NOT_FOUND.into_response(),
+    };
+    let ws_canon = match workspace.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return StatusCode::NOT_FOUND.into_response(),
+    };
+    if !file_path.starts_with(&ws_canon) {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    let bytes = match tokio::fs::read(&file_path).await {
+        Ok(b) => b,
+        Err(_) => return StatusCode::NOT_FOUND.into_response(),
+    };
+
+    let mime = mime_guess::from_path(&file_path)
+        .first_or_octet_stream()
+        .to_string();
+
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, mime)
+        .body(Body::from(bytes))
+        .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response())
 }
 
 pub fn build_cors() -> CorsLayer {
@@ -84,7 +127,9 @@ pub fn build_router(state: AppState) -> Router {
         .route("/export/*item_id", get(export::export_for_agent))
         .route("/upload", post(upload::upload_file))
         .route("/config", get(config_handler::get_config).patch(config_handler::update_config))
-        .with_state(state);
+        .with_state(state.clone());
 
-    Router::new().nest("/api", api)
+    Router::new()
+        .nest("/api", api)
+        .route("/workspace/*path", get(serve_workspace_file).with_state(state))
 }

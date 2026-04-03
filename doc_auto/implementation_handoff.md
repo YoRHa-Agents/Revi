@@ -6,6 +6,7 @@
 - `common` 前门负责 `dev / demo / docs / release` 语义；`revi` 二进制继续负责产品 API 与 workspace/data runtime。
 - `doc_auto/` 与 `AGENTS.md` 现在是结构性变更的真相源入口。
 - Playwright 已切换为 Rust server 启动路径，并使用 `testdata/e2e/` 复制出的测试 workspace/data，而不再启动 Python `uvicorn`。
+- Revi 支持无 workspace 启动：`Config.workspace_path` 现为 `Option<PathBuf>`，不提供 `--workspace` 参数时服务器正常启动但返回空列表；前端展示 workspace 选择器页面，支持设定本地路径或连接远程 Revi 服务器。`PATCH /api/config` 现在热更新运行时 Config 和 WorkspaceScanner（通过 `RwLock`），无需重启。`/workspace/*` 静态文件服务改为动态 handler 以跟随配置变更。
 
 ## 当前待关闭项
 - Revi 是否需要把更多通用 release/Pages/test seam 回推到 `RustWebAppCommon`。
@@ -39,4 +40,4 @@ cargo run --manifest-path common/cli/Cargo.toml -- release
 10. Rust 测试辅助已清理低价值 `dead_code` 警告；第二轮文档收口后，upload API 说明与 Rust 真实接口一致。
 
 ## Last Updated
-- 2026-04-02T11:01:35+00:00
+- 2026-04-03T07:40:00+00:00

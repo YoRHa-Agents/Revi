@@ -1,7 +1,6 @@
-use std::{net::SocketAddr, sync::Arc};
+use std::net::SocketAddr;
 
 use clap::Parser;
-use tower_http::services::ServeDir;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use revi_server::{
@@ -20,21 +19,25 @@ async fn main() -> anyhow::Result<()> {
         .init();
 
     let cli = Cli::parse();
-    let config = Arc::new(Config::load(&cli)?);
+    let config = Config::load(&cli)?;
 
-    tracing::info!("workspace: {}", config.workspace_path.display());
+    if let Some(ref ws) = config.workspace_path {
+        tracing::info!("workspace: {}", ws.display());
+    } else {
+        tracing::info!("workspace: (not configured — set via web UI or PATCH /api/config)");
+    }
     tracing::info!("data:      {}", config.data_path.display());
     tracing::info!("port:      {}", config.port);
     tracing::info!("config:    {}", config.config_file.display());
 
     std::fs::create_dir_all(&config.data_path)?;
-    std::fs::create_dir_all(&config.workspace_path)?;
+    if let Some(ref ws) = config.workspace_path {
+        std::fs::create_dir_all(ws)?;
+    }
 
     let state = AppState::new(config.clone())?;
 
-    let workspace_dir = config.workspace_path.clone();
     let app = build_router(state)
-        .nest_service("/workspace", ServeDir::new(&workspace_dir))
         .layer(build_cors());
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));

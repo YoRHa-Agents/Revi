@@ -1,5 +1,18 @@
-// The Rust `revi` server is the only supported API runtime.
-const BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8000'
+import { reactive } from 'vue'
+
+const serverState = reactive({
+  base: localStorage.getItem('revi_api_base') || import.meta.env.VITE_API_BASE || 'http://localhost:8000',
+})
+
+export function getApiBase() {
+  return serverState.base
+}
+
+export function setApiBase(url) {
+  const normalized = url.replace(/\/+$/, '')
+  serverState.base = normalized
+  localStorage.setItem('revi_api_base', normalized)
+}
 
 async function request(method, path, body) {
   const opts = {
@@ -7,12 +20,11 @@ async function request(method, path, body) {
     headers: body ? { 'Content-Type': 'application/json' } : {},
     body: body ? JSON.stringify(body) : undefined,
   }
-  const res = await fetch(BASE + path, opts)
+  const res = await fetch(serverState.base + path, opts)
   if (!res.ok) {
     const text = await res.text().catch(() => '')
     throw new Error(`${method} ${path} → ${res.status}: ${text}`)
   }
-  // 204 No Content or empty body
   const ct = res.headers.get('content-type') || ''
   if (ct.includes('application/json')) return res.json()
   return null
@@ -27,6 +39,8 @@ export const api = {
   archiveResolved: (id)      => request('POST',  `/api/archive/${id}`),
   getArchive:      (id)      => request('GET',   `/api/archive/${id}`),
   exportForAgent:  (id)      => request('GET',   `/api/export/${id}`),
-  upload:          (fd)      => fetch(BASE + '/api/upload', { method: 'POST', body: fd }).then(r => r.json()),
+  upload:          (fd)      => fetch(serverState.base + '/api/upload', { method: 'POST', body: fd }).then(r => r.json()),
   updateType: (id, type) => request('PATCH', `/api/reviews/${id}`, { type }),
+  getConfig:       ()        => request('GET',   '/api/config'),
+  updateConfig:    (body)    => request('PATCH', '/api/config', body),
 }

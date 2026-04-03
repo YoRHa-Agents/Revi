@@ -1,7 +1,5 @@
 #![allow(dead_code)]
 
-use std::sync::Arc;
-
 use axum::{
     body::Body,
     http::{Method, Request, StatusCode},
@@ -50,12 +48,12 @@ impl AppFixture {
         )
         .unwrap();
 
-        let config = Arc::new(Config {
-            workspace_path: workspace.path().to_path_buf(),
+        let config = Config {
+            workspace_path: Some(workspace.path().to_path_buf()),
             data_path: data.path().to_path_buf(),
             port: 0,
             config_file: std::path::PathBuf::from("revi.toml"),
-        });
+        };
         let state = AppState::new(config).unwrap();
         let app = build_router(state);
 

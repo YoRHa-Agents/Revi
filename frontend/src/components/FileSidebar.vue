@@ -83,7 +83,7 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { state } from '../mock/data.js'
+import { state } from '../store/index.js'
 
 const route = useRoute()
 const { t, locale } = useI18n()
@@ -105,8 +105,8 @@ const filteredItems = computed(() => {
   const q = query.value.trim().toLowerCase()
   if (!q) return state.items
   return state.items.filter(item =>
-    item.title.toLowerCase().includes(q) ||
-    item.titleZh.toLowerCase().includes(q)
+    (item.title || '').toLowerCase().includes(q) ||
+    (item.titleZh || '').toLowerCase().includes(q)
   )
 })
 

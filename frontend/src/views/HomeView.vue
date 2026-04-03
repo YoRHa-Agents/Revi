@@ -1,124 +1,188 @@
 <template>
   <div class="home">
-    <!-- Hero -->
-    <div class="hero">
-      <div class="hero-text">
-        <h1 class="hero-title">{{ t('dashboard.welcome') }}</h1>
-        <p class="hero-tagline">{{ t('dashboard.tagline') }}</p>
-      </div>
-      <div class="hero-badge">
-        <span class="badge-r">R</span>
-      </div>
-    </div>
+    <!-- Workspace Setup (shown when not configured) -->
+    <div v-if="state.workspaceConfigured === false" class="workspace-setup">
+      <div class="setup-card">
+        <div class="setup-icon">R</div>
+        <h1 class="setup-title">{{ t('workspace.welcome') }}</h1>
+        <p class="setup-desc">{{ t('workspace.description') }}</p>
 
-    <!-- Stats row -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <span class="stat-num">{{ state.items.length }}</span>
-        <span class="stat-label">{{ t('dashboard.totalItems') }}</span>
-      </div>
-      <div class="stat-card accent-red">
-        <span class="stat-num">{{ totalOpen }}</span>
-        <span class="stat-label">{{ t('dashboard.openComments') }}</span>
-      </div>
-      <div class="stat-card accent-green">
-        <span class="stat-num">{{ totalResolved }}</span>
-        <span class="stat-label">{{ t('dashboard.resolvedComments') }}</span>
-      </div>
-      <div class="stat-card accent-gray">
-        <span class="stat-num">{{ totalArchived }}</span>
-        <span class="stat-label">{{ t('nav.archive') }}</span>
-      </div>
-    </div>
+        <div v-if="state.error" class="error">{{ state.error }}</div>
 
-    <!-- Loading / Error -->
-    <div v-if="state.loading" class="loading">Loading...</div>
-    <div v-if="state.error" class="error">{{ state.error }}</div>
-
-    <!-- All items -->
-    <div class="section">
-      <div class="section-header">
-        <h2 class="section-title">{{ t('dashboard.allItems') }}</h2>
-        <div class="upload-actions">
-          <button class="upload-btn" @click="$refs.fileInput.click()">
-            <span>📄</span> {{ t('home.openFile') }}
-          </button>
-          <button class="upload-btn" @click="$refs.folderInput.click()">
-            <span>📁</span> {{ t('home.openFolder') }}
-          </button>
-          <input ref="fileInput" type="file" multiple style="display:none"
-            accept=".md,.html,.htm,.png,.jpg,.jpeg,.svg,.webp,.pdf"
-            @change="onFilesSelected($event.target.files); $refs.fileInput.value=''" />
-          <input ref="folderInput" type="file" webkitdirectory style="display:none"
-            @change="onFilesSelected($event.target.files); $refs.folderInput.value=''" />
+        <!-- Local workspace path -->
+        <div class="setup-section">
+          <label class="setup-label">{{ t('workspace.localPath') }}</label>
+          <div class="input-row">
+            <input
+              v-model="workspacePath"
+              type="text"
+              class="setup-input"
+              :placeholder="t('workspace.pathPlaceholder')"
+              @keyup.enter="applyWorkspace"
+            />
+            <button
+              class="setup-btn primary"
+              :disabled="!workspacePath.trim() || state.configLoading"
+              @click="applyWorkspace"
+            >
+              {{ state.configLoading ? '...' : t('workspace.open') }}
+            </button>
+          </div>
         </div>
 
-        <div v-if="pendingFiles.length" class="upload-modal-overlay" @click.self="pendingFiles = []">
-          <div class="upload-modal">
-            <h3 class="modal-title">{{ t('home.uploadFiles') }}</h3>
-            <div class="file-list">
-              <div v-for="(pf, i) in pendingFiles" :key="i" class="file-row">
-                <span class="file-name">{{ pf.file.name }}</span>
-                <select v-model="pf.type" class="type-select">
-                  <option value="auto">{{ t('home.typeAuto') }} ({{ pf.detected }})</option>
-                  <option value="plan">{{ t('home.typePlan') }}</option>
-                  <option value="design">{{ t('home.typeDesign') }}</option>
-                  <option value="prototype">{{ t('home.typePrototype') }}</option>
-                </select>
-                <button class="remove-btn" @click="pendingFiles.splice(i, 1)">✕</button>
+        <!-- Remote server -->
+        <div class="setup-section">
+          <label class="setup-label">{{ t('workspace.remoteServer') }}</label>
+          <div class="input-row">
+            <input
+              v-model="remoteUrl"
+              type="text"
+              class="setup-input"
+              :placeholder="t('workspace.remotePlaceholder')"
+              @keyup.enter="connectRemote"
+            />
+            <button
+              class="setup-btn"
+              :disabled="!remoteUrl.trim() || connecting"
+              @click="connectRemote"
+            >
+              {{ connecting ? '...' : t('workspace.connect') }}
+            </button>
+          </div>
+        </div>
+
+        <div class="setup-hint">{{ t('workspace.hint') }}</div>
+      </div>
+    </div>
+
+    <!-- Normal dashboard (shown when workspace configured) -->
+    <template v-else-if="state.workspaceConfigured !== null">
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-text">
+          <h1 class="hero-title">{{ t('dashboard.welcome') }}</h1>
+          <p class="hero-tagline">{{ t('dashboard.tagline') }}</p>
+        </div>
+        <div class="hero-badge">
+          <span class="badge-r">R</span>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-num">{{ state.items.length }}</span>
+          <span class="stat-label">{{ t('dashboard.totalItems') }}</span>
+        </div>
+        <div class="stat-card accent-red">
+          <span class="stat-num">{{ totalOpen }}</span>
+          <span class="stat-label">{{ t('dashboard.openComments') }}</span>
+        </div>
+        <div class="stat-card accent-green">
+          <span class="stat-num">{{ totalResolved }}</span>
+          <span class="stat-label">{{ t('dashboard.resolvedComments') }}</span>
+        </div>
+        <div class="stat-card accent-gray">
+          <span class="stat-num">{{ totalArchived }}</span>
+          <span class="stat-label">{{ t('nav.archive') }}</span>
+        </div>
+      </div>
+
+      <!-- Loading / Error -->
+      <div v-if="state.loading" class="loading">Loading...</div>
+      <div v-if="state.error" class="error">{{ state.error }}</div>
+
+      <!-- Workspace path indicator -->
+      <div v-if="state.config" class="workspace-indicator">
+        <span class="ws-label">{{ t('workspace.current') }}:</span>
+        <span class="ws-path">{{ state.config.workspacePath }}</span>
+        <button class="ws-change" @click="state.workspaceConfigured = false">
+          {{ t('workspace.change') }}
+        </button>
+      </div>
+
+      <!-- All items -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">{{ t('dashboard.allItems') }}</h2>
+          <div class="upload-actions">
+            <button class="upload-btn" @click="$refs.fileInput.click()">
+              <span>📄</span> {{ t('home.openFile') }}
+            </button>
+            <button class="upload-btn" @click="$refs.folderInput.click()">
+              <span>📁</span> {{ t('home.openFolder') }}
+            </button>
+            <input ref="fileInput" type="file" multiple style="display:none"
+              accept=".md,.html,.htm,.png,.jpg,.jpeg,.svg,.webp,.pdf"
+              @change="onFilesSelected($event.target.files); $refs.fileInput.value=''" />
+            <input ref="folderInput" type="file" webkitdirectory style="display:none"
+              @change="onFilesSelected($event.target.files); $refs.folderInput.value=''" />
+          </div>
+
+          <div v-if="pendingFiles.length" class="upload-modal-overlay" @click.self="pendingFiles = []">
+            <div class="upload-modal">
+              <h3 class="modal-title">{{ t('home.uploadFiles') }}</h3>
+              <div class="file-list">
+                <div v-for="(pf, i) in pendingFiles" :key="i" class="file-row">
+                  <span class="file-name">{{ pf.file.name }}</span>
+                  <select v-model="pf.type" class="type-select">
+                    <option value="auto">{{ t('home.typeAuto') }} ({{ pf.detected }})</option>
+                    <option value="plan">{{ t('home.typePlan') }}</option>
+                    <option value="design">{{ t('home.typeDesign') }}</option>
+                    <option value="prototype">{{ t('home.typePrototype') }}</option>
+                  </select>
+                  <button class="remove-btn" @click="pendingFiles.splice(i, 1)">✕</button>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="cancel-btn" @click="pendingFiles = []">{{ t('review.cancel') }}</button>
+                <button class="confirm-btn" :disabled="uploading" @click="uploadPending">
+                  {{ uploading ? '...' : t('home.uploadConfirm') }}
+                </button>
               </div>
             </div>
-            <div class="modal-footer">
-              <button class="cancel-btn" @click="pendingFiles = []">{{ t('review.cancel') }}</button>
-              <button class="confirm-btn" :disabled="uploading" @click="uploadPending">
-                {{ uploading ? '...' : t('home.uploadConfirm') }}
-              </button>
+          </div>
+        </div>
+        <div class="item-grid">
+          <div v-for="item in state.items" :key="item.id" class="item-card">
+            <div class="card-stripe" :class="item.type"></div>
+
+            <div class="card-body">
+              <div class="card-top">
+                <span class="type-badge" :class="item.type">
+                  <span class="type-icon">{{ typeIcon(item.type) }}</span>
+                  {{ t('home.type.' + item.type) }}
+                </span>
+                <span class="updated-at">{{ relativeTime(item.updatedAt) }}</span>
+              </div>
+
+              <h3 class="card-title">{{ locale === 'zh' ? item.titleZh : item.title }}</h3>
+              <p class="card-desc">{{ locale === 'zh' ? item.descriptionZh : item.description }}</p>
+
+              <div class="card-footer">
+                <div class="comment-status">
+                  <span v-if="state.openCount(item.id) > 0" class="status-pill open">
+                    <span class="status-dot"></span>
+                    {{ state.openCount(item.id) }} {{ t('home.openComments') }}
+                  </span>
+                  <span v-if="state.resolvedCount(item.id) > 0" class="status-pill resolved">
+                    ✓ {{ state.resolvedCount(item.id) }}
+                  </span>
+                  <span v-if="!state.openCount(item.id) && !state.resolvedCount(item.id)" class="status-pill empty">
+                    {{ t('home.noComments') }}
+                  </span>
+                </div>
+
+                <router-link :to="'/review/' + item.id" class="open-btn">
+                  {{ t('dashboard.open') }}
+                  <span class="btn-arrow">→</span>
+                </router-link>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="item-grid">
-        <div v-for="item in state.items" :key="item.id" class="item-card">
-          <!-- Card color stripe -->
-          <div class="card-stripe" :class="item.type"></div>
-
-          <div class="card-body">
-            <div class="card-top">
-              <span class="type-badge" :class="item.type">
-                <span class="type-icon">{{ typeIcon(item.type) }}</span>
-                {{ t('home.type.' + item.type) }}
-              </span>
-              <span class="updated-at">{{ relativeTime(item.updatedAt) }}</span>
-            </div>
-
-            <h3 class="card-title">{{ locale === 'zh' ? item.titleZh : item.title }}</h3>
-            <p class="card-desc">{{ locale === 'zh' ? item.descriptionZh : item.description }}</p>
-
-            <div class="card-footer">
-              <!-- Comment status -->
-              <div class="comment-status">
-                <span v-if="state.openCount(item.id) > 0" class="status-pill open">
-                  <span class="status-dot"></span>
-                  {{ state.openCount(item.id) }} {{ t('home.openComments') }}
-                </span>
-                <span v-if="state.resolvedCount(item.id) > 0" class="status-pill resolved">
-                  ✓ {{ state.resolvedCount(item.id) }}
-                </span>
-                <span v-if="!state.openCount(item.id) && !state.resolvedCount(item.id)" class="status-pill empty">
-                  {{ t('home.noComments') }}
-                </span>
-              </div>
-
-              <!-- Open button -->
-              <router-link :to="'/review/' + item.id" class="open-btn">
-                {{ t('dashboard.open') }}
-                <span class="btn-arrow">→</span>
-              </router-link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -127,11 +191,52 @@
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { state } from '../store/index.js'
-import { api } from '../api/client.js'
+import { api, setApiBase, getApiBase } from '../api/client.js'
 
 const { t, locale } = useI18n()
 
-onMounted(() => state.fetchItems())
+const workspacePath = ref('')
+const remoteUrl = ref('')
+const connecting = ref(false)
+
+onMounted(async () => {
+  await state.fetchConfig()
+  if (state.workspaceConfigured) {
+    await state.fetchItems()
+  }
+})
+
+async function applyWorkspace() {
+  if (!workspacePath.value.trim()) return
+  state.error = null
+  try {
+    await state.setWorkspacePath(workspacePath.value.trim())
+  } catch {
+    // error already set in store
+  }
+}
+
+async function connectRemote() {
+  if (!remoteUrl.value.trim()) return
+  connecting.value = true
+  state.error = null
+  const url = remoteUrl.value.trim().replace(/\/+$/, '')
+  try {
+    const res = await fetch(url + '/api/config')
+    if (!res.ok) throw new Error(`Server responded ${res.status}`)
+    const cfg = await res.json()
+    setApiBase(url)
+    state.config = cfg
+    state.workspaceConfigured = cfg.workspaceConfigured
+    if (cfg.workspaceConfigured) {
+      await state.fetchItems()
+    }
+  } catch (e) {
+    state.error = t('workspace.connectError') + ': ' + e.message
+  } finally {
+    connecting.value = false
+  }
+}
 
 const pendingFiles = ref([])
 const uploading = ref(false)
@@ -198,6 +303,74 @@ function relativeTime(iso) {
 
 <style scoped>
 .home { height: 100%; overflow-y: auto; padding: 28px 32px; display: flex; flex-direction: column; gap: 28px; }
+
+/* Workspace Setup */
+.workspace-setup {
+  display: flex; align-items: center; justify-content: center;
+  flex: 1; min-height: 400px;
+}
+.setup-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  padding: 40px 48px; max-width: 560px; width: 100%;
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+}
+.setup-icon {
+  width: 64px; height: 64px; background: var(--text); color: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; font-weight: 400; letter-spacing: 0.1em;
+}
+.setup-title {
+  font-size: 22px; font-weight: 400; color: var(--text);
+  letter-spacing: 0.04em; text-align: center;
+}
+.setup-desc {
+  font-size: 14px; color: var(--text-dim); line-height: 1.6;
+  text-align: center; max-width: 400px;
+}
+.setup-section { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.setup-label {
+  font-size: 11px; font-weight: 500; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: 0.12em;
+}
+.input-row { display: flex; gap: 8px; }
+.setup-input {
+  flex: 1; padding: 9px 12px; border: 1px solid var(--border);
+  background: var(--bg-input, var(--bg)); color: var(--text);
+  font-size: 13px; font-family: inherit; outline: none;
+  transition: border-color 0.15s;
+}
+.setup-input:focus { border-color: var(--accent); }
+.setup-input::placeholder { color: var(--text-faint); }
+.setup-btn {
+  padding: 9px 18px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-dim); font-size: 13px;
+  font-weight: 500; cursor: pointer; transition: all 0.15s;
+  letter-spacing: 0.04em; white-space: nowrap;
+}
+.setup-btn:hover { border-color: var(--accent); color: var(--accent); }
+.setup-btn:disabled { opacity: 0.4; cursor: default; }
+.setup-btn.primary {
+  background: var(--text); color: var(--bg); border-color: var(--text);
+}
+.setup-btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+.setup-hint {
+  font-size: 12px; color: var(--text-faint); text-align: center;
+  line-height: 1.5; margin-top: 4px;
+}
+
+/* Workspace indicator */
+.workspace-indicator {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; background: var(--bg-card); border: 1px solid var(--border);
+  font-size: 12px;
+}
+.ws-label { color: var(--text-faint); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+.ws-path { color: var(--text-dim); font-family: monospace; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-change {
+  background: none; border: 1px solid var(--border); color: var(--text-faint);
+  padding: 3px 10px; font-size: 11px; cursor: pointer; transition: all 0.15s;
+}
+.ws-change:hover { border-color: var(--accent); color: var(--accent); }
 
 .hero {
   display: flex; align-items: center; justify-content: space-between;

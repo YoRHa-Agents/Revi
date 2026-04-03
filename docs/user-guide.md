@@ -8,12 +8,19 @@ If you want the styled web version, open [the live guide](https://yorha-agents.g
 
 ## Workspace Setup
 
-Revi auto-discovers files from the active Rust server workspace, which defaults to `~/.revi/workspace/`. Drop files into the appropriate subfolder and they will appear in the sidebar automatically on next server start (or immediately if using the upload API).
+Revi can start **with or without** a workspace path. If no workspace is provided via CLI or config file, the web UI shows a **Workspace Setup** screen where you can:
+
+- **Enter a local path** — point Revi to a directory on the server containing your plans, designs, and prototypes. The directory will be created if it doesn't exist.
+- **Connect to a remote Revi server** — enter a remote Revi server URL (e.g. `http://192.168.1.100:8000`) to use a workspace hosted elsewhere. The frontend switches its API target without needing to restart anything.
+
+Once configured, the workspace path is saved to `revi.toml` and persists across restarts. You can change it at any time by clicking **Change** in the workspace indicator bar, or via `PATCH /api/config`.
+
+If you start Revi with `--workspace /path/to/dir`, it skips the setup screen and goes straight to the dashboard.
 
 ### Folder structure
 
 ```
-~/.revi/workspace/
+your-workspace/
   plans/          ← Markdown documents (.md)
   designs/        ← Image files (.png, .jpg, .gif, .webp, .svg)
   prototypes/     ← Interactive HTML files (.html)
@@ -48,9 +55,13 @@ curl -X POST http://localhost:8000/api/upload \
 The Rust server infers the target subfolder from the file extension. If needed,
 you can also add `-F "type=plan"` / `design` / `prototype` as an override.
 
-### Via drag-and-drop (future)
+### Via the web UI
 
-The upload endpoint is designed to support a drag-and-drop UI — place files into the correct subfolder of `workspace/` directly as an alternative.
+Click **Open File** or **Open Folder** on the home dashboard to upload files through the browser. A dialog lets you confirm or override the detected type for each file before uploading.
+
+### Via drag-and-drop
+
+Place files directly into the correct subfolder of the workspace directory.
 
 ---
 

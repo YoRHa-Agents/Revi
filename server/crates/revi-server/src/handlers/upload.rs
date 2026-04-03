@@ -92,7 +92,12 @@ pub async fn upload_file(
             .ok_or_else(|| AppError::BadRequest(format!("unsupported extension '{}'", ext)))?
     };
 
-    let dest_dir = s.config.workspace_path.join(subfolder);
+    let workspace_path = {
+        let cfg = s.config.read().unwrap();
+        cfg.effective_workspace()
+    };
+
+    let dest_dir = workspace_path.join(subfolder);
     std::fs::create_dir_all(&dest_dir)
         .map_err(|e| AppError::Internal(e.into()))?;
 

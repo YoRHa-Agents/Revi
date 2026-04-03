@@ -44,7 +44,7 @@ pub struct ConfigFile {
 
 #[derive(Clone, Debug)]
 pub struct Config {
-    pub workspace_path: PathBuf,
+    pub workspace_path: Option<PathBuf>,
     pub data_path: PathBuf,
     pub port: u16,
     /// The config file that was loaded (or would be written to on save)
@@ -66,8 +66,7 @@ impl Config {
         let workspace_path = cli
             .workspace
             .clone()
-            .or_else(|| file_cfg.workspace.as_deref().map(PathBuf::from))
-            .unwrap_or_else(default_workspace_dir);
+            .or_else(|| file_cfg.workspace.as_deref().map(PathBuf::from));
 
         let data_path = cli
             .data
@@ -80,13 +79,23 @@ impl Config {
         Ok(Self { workspace_path, data_path, port, config_file })
     }
 
+    pub fn workspace_configured(&self) -> bool {
+        self.workspace_path.is_some()
+    }
+
+    pub fn effective_workspace(&self) -> PathBuf {
+        self.workspace_path
+            .clone()
+            .unwrap_or_else(default_workspace_dir)
+    }
+
     /// Persist current values to the config file.
     pub fn save(&self) -> anyhow::Result<()> {
         if let Some(parent) = self.config_file.parent() {
             std::fs::create_dir_all(parent)?;
         }
         let file_cfg = ConfigFile {
-            workspace: Some(self.workspace_path.display().to_string()),
+            workspace: self.workspace_path.as_ref().map(|p| p.display().to_string()),
             data: Some(self.data_path.display().to_string()),
             port: Some(self.port),
         };
