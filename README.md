@@ -5,7 +5,6 @@
 <p align="center">
   <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/Rust-1.75+-454138?style=flat&logo=rust&logoColor=DAD4BB&labelColor=454138" alt="Rust"></a>
   <a href="https://vuejs.org"><img src="https://img.shields.io/badge/Vue-3.4-454138?style=flat&logo=vuedotjs&logoColor=DAD4BB&labelColor=454138" alt="Vue 3"></a>
-  <a href="https://www.python.org"><img src="https://img.shields.io/badge/Python-3.11+-454138?style=flat&logo=python&logoColor=DAD4BB&labelColor=454138" alt="Python"></a>
   <a href="https://yorha-agents.github.io/Revi/"><img src="https://img.shields.io/badge/site-GitHub%20Pages-C2572B?style=flat&labelColor=454138" alt="Site"></a>
   <a href="https://yorha-agents.github.io/Revi/demo/"><img src="https://img.shields.io/badge/demo-interactive-C2572B?style=flat&labelColor=454138" alt="Demo"></a>
 </p>
@@ -13,6 +12,8 @@
 ---
 
 Revi bridges the gap between human reviewers and AI agents. Reviewers browse markdown plans, design mockups, and interactive HTML prototypes in a split-pane UI, leaving **anchored comments** pinned to specific headings, text selections, image annotation pins, or prototype steps. Agents consume a structured JSON export at `/api/export/{item_id}` that surfaces only open feedback with anchor references — read, act, resolve, repeat.
+
+This repository now treats `RustWebAppCommon` as the base pattern: shared contracts, adapter boundaries, docs/demo/release front doors, and truth-source governance live under `common/`, `AGENTS.md`, and `doc_auto/`. Revi’s review API, workspace scanner, comments, archive, and export workflow remain product-specific `app_owned` behavior on top of that base.
 
 <p align="center">
   <a href="https://yorha-agents.github.io/Revi/demo/"><em>Try the interactive demo →</em></a>
@@ -58,7 +59,7 @@ Revi bridges the gap between human reviewers and AI agents. Reviewers browse mar
 
 ## Quick Start
 
-### Option A — Pre-built binary (recommended)
+### Option A — Rust + Vue (recommended)
 
 ```bash
 # Linux x86-64
@@ -75,14 +76,12 @@ cd frontend && npm install && npm run dev
 # → http://localhost:5173
 ```
 
-### Option B — Python backend (development)
+### Option B — Common front door (base-aligned)
 
 ```bash
-cd backend && pip install -e ".[dev]"
-uvicorn backend.main:app --reload --port 8000
-
-# In another terminal:
-cd frontend && npm install && npm run dev
+cargo run --manifest-path common/cli/Cargo.toml -- dev --surface web --host 127.0.0.1 --port 5173
+cd server && cargo run --bin revi
+cd frontend && npm run dev -- --host 127.0.0.1 --port 5173
 ```
 
 ### Configuration
@@ -103,19 +102,25 @@ port      = 9000
 ```
 ┌──────────────┐     REST API      ┌────────────────────────┐
 │  Vue 3 SPA   │ ←───────────────→ │  Rust binary (revi)    │
-│  (port 5173) │                   │  or FastAPI backend     │
+│  (port 5173) │                   │  app_owned review API   │
 └──────────────┘                   │  (port 8000)            │
                                    ├────────────────────────┤
-                                   │  workspace/             │
-┌──────────────┐     JSON export   │    plans/*.md           │
-│  AI Agent    │ ←───────────────→ │    designs/*.png        │
-│  (any LLM)   │                   │    prototypes/*.html    │
-└──────────────┘                   ├────────────────────────┤
-                                   │  data/                  │
-                                   │    comments/*.json      │
-                                   │    archive/*.json       │
+                                   │  common/               │
+┌──────────────┐   docs/demo/release│    core/ adapters/ cli/│
+│  AI Agent    │ ←───────────────→ │  doc_auto/ AGENTS.md   │
+│  (any LLM)   │    JSON export     ├────────────────────────┤
+└──────────────┘                   │  workspace/ data/       │
+                                   │  site/ docs/ frontend/  │
                                    └────────────────────────┘
 ```
+
+## Base Adoption
+
+- `common/core` provides shared route/docs/theme/release contracts.
+- `common/adapters` provides reusable site/docs/release seams.
+- `common/cli` provides the unified `dev / demo / docs / release` front door.
+- `server/crates/revi-server/src/base.rs` maps Revi’s product metadata onto those common contracts without moving review-domain models into common.
+- `AGENTS.md` and `doc_auto/` are the truth-source layer for structural changes.
 
 ## Agent Integration
 
@@ -150,7 +155,7 @@ The `item_id` format is `{subfolder}/{stem}` — e.g. `plans/sprint-1-design`, `
 | `PATCH` | `/api/comments/{item_id}/{id}/resolve` | Resolve a comment |
 | `POST` | `/api/archive/{item_id}` | Archive all resolved comments |
 | `GET` | `/api/archive/{item_id}` | List archived batches |
-| `POST` | `/api/upload/{subfolder}` | Upload a file to workspace |
+| `POST` | `/api/upload` | Upload a file to workspace; server infers or accepts `type` for target subfolder |
 | `GET` | `/api/config` | View server config |
 | `PATCH` | `/api/config` | Update config |
 
@@ -169,26 +174,35 @@ workspace/
 
 | Guide | Description |
 |-------|-------------|
+| [Docs Index](docs/index.md) | Front door for human, main-agent, and subagent readers after base adoption |
 | [Live User Guide](https://yorha-agents.github.io/Revi/guide/) | Styled GitHub Pages guide for human reviewers — setup, navigation, comments, anchors, archive workflow |
 | [User Guide](docs/user-guide.md) | UI walkthrough for human reviewers — workspace setup, navigation, commenting, archiving |
 | [Agent API Guide](docs/agent-guide.md) | Full endpoint reference, schemas, reference types, and polling strategies for AI agents |
 | [Deploy Pages](docs/deploy-pages.md) | Step-by-step guide to deploying the GitHub Pages landing site and demo |
-| [Load Testing](docs/load-test.md) | Locust-based performance testing — smoke, normal, peak, and soak scenarios |
+| [Load Testing](docs/load-test.md) | Rust benchmark + concurrent smoke testing guide for the Rust API runtime |
 
 ## Development
 
 ### Build from source
 
 ```bash
+# Unified base/front-door commands
+make demo
+make docs
+make release
+make validate
+
 # Run tests
-make test-rust            # 53 integration tests
-cd frontend && npm test   # Vitest unit tests
+make test-rust
+cd frontend && npm test
+cd frontend && npm run test:e2e
 
 # Build binaries
 make build-macos          # → dist/revi-macos-aarch64
 make build-linux          # → dist/revi-linux-x86_64
+make release              # → release/revi-<platform> + SHA256SUMS + manifests
 
-# Dev server
+# Dev runtime
 make dev-rust
 ```
 
@@ -213,9 +227,9 @@ npm run test:e2e     # Playwright E2E tests
 | Layer | Technology |
 |-------|-----------|
 | Frontend | Vue 3 · Vue Router · Vue I18n · Vite |
-| Backend (primary) | Rust · Axum · Tokio · Serde |
-| Backend (reference) | Python · FastAPI · Pydantic |
-| Testing | Vitest · Playwright · Cargo test · Locust |
+| Backend | Rust · Axum · Tokio · Serde |
+| Base | RustWebAppCommon-inspired `common_core` · `common_adapters` · `common_cli` |
+| Testing | Vitest · Playwright · Cargo test · Criterion · shell smoke |
 
 ---
 

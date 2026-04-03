@@ -102,7 +102,7 @@
                 <div class="m-mdpre">GET /api/export/{id}</div>
                 <div class="m-mdp">Returns structured JSON with open_comments array for AI agents.</div>
                 <div class="m-mdh2">## Next Steps</div>
-                <div class="m-mdp">□ FastAPI backend &nbsp; □ Wire frontend &nbsp; □ File upload</div>
+                <div class="m-mdp">□ Rust runtime hardening &nbsp; □ Wire frontend &nbsp; □ File upload</div>
               </div>
               <div class="m-cp">
                 <div class="m-cptabs">

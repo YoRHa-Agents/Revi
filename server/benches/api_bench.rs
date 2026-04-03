@@ -44,6 +44,7 @@ fn setup() -> Fixture {
         workspace_path: workspace.path().to_path_buf(),
         data_path: data.path().to_path_buf(),
         port: 0,
+        config_file: std::path::PathBuf::from("revi.toml"),
     });
     let state = AppState::new(config).unwrap();
     let app = build_router(state);

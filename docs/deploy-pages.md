@@ -2,6 +2,8 @@
 
 This guide covers deploying the Revi landing site and interactive demo to GitHub Pages.
 
+The Pages deployment only publishes the static `site/` front door. The supported review runtime remains the Rust `revi` server plus the Vue frontend.
+
 **What gets deployed:**
 
 | URL | Source | Content |

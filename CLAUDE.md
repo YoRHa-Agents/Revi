@@ -11,20 +11,20 @@ Revi is an agent-human review tool. Humans annotate plans/designs/prototypes; ag
 ./dist/revi-linux-x86_64      # Linux x86-64
 
 # Custom paths
-./revi --workspace backend/workspace --data backend/data --port 8000
+./revi --workspace /my/docs --data /my/data --port 8000
 
 # Or create revi.toml next to the binary:
-# workspace = "backend/workspace"
-# data      = "backend/data"
+# workspace = "/my/docs"
+# data      = "/my/data"
 # port      = 8000
 ```
 
-**Python backend (dev/reference):**
+**Base front door (recommended for local setup):**
 ```bash
-cd backend && uvicorn main:app --reload --port 8000
+cargo run --manifest-path common/cli/Cargo.toml -- dev --surface web --host 127.0.0.1 --port 5173
 ```
 
-**Frontend (either backend):**
+**Frontend:**
 ```bash
 cd frontend && npm run dev
 ```

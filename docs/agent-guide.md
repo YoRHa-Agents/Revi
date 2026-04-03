@@ -2,6 +2,8 @@
 
 This document is the complete API reference for AI agents integrating with Revi. It covers all endpoints, request/response schemas, error codes, reference types, and recommended polling strategies.
 
+The supported runtime behind these endpoints is the Rust `revi` server. Any remaining Python assets in this repository are historical reference or tooling inputs, not the product API runtime.
+
 ---
 
 ## Base URL
@@ -355,32 +357,34 @@ Agent export endpoint. Returns only open (unresolved) comments for the item, tog
 
 ---
 
-### POST /api/upload/{subfolder}
+### POST /api/upload
 
-Upload a file into the workspace. The subfolder determines the item type.
-
-**Path parameters**
-
-| Parameter | Values |
-|-----------|--------|
-| `subfolder` | `plans` \| `designs` \| `prototypes` |
+Upload a file into the workspace. The Rust server infers the target subfolder from
+the file extension, or you can override it with a multipart `type` field.
 
 **Request**
 
-`multipart/form-data` with a `file` field.
+`multipart/form-data` with a `file` field. Optional `type` values:
+`plan`, `design`, `prototype`.
 
 ```bash
-curl -X POST http://localhost:8000/api/upload/plans \
+curl -X POST http://localhost:8000/api/upload \
   -F "file=@sprint-2-plan.md"
 ```
 
-**Response — 200 OK**
+```bash
+curl -X POST http://localhost:8000/api/upload \
+  -F "file=@wireframe.bin" \
+  -F "type=design"
+```
+
+**Response — 201 Created**
 
 ```json
 {
   "itemId": "plans/sprint-2-plan",
   "filename": "sprint-2-plan.md",
-  "url": "/api/workspace/plans/sprint-2-plan.md"
+  "url": "/workspace/plans/sprint-2-plan.md"
 }
 ```
 
@@ -388,8 +392,8 @@ curl -X POST http://localhost:8000/api/upload/plans \
 
 | Code | Condition |
 |------|-----------|
-| 400 | Invalid subfolder or unsupported file type |
-| 422 | Missing file field |
+| 400 | Invalid `type` or unsupported file type |
+| 400 | Missing file field |
 
 ---
 

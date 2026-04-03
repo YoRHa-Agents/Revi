@@ -1,0 +1,7 @@
+{
+  "web_runtime_id": "revi_rust_vue",
+  "web_entry_route": "/review/plans/sprint-1-design",
+  "docs_index_path": "/guide/",
+  "pages_strategy": "static_site_plus_hash_spa",
+  "api_default_origin": "http://localhost:8000"
+}

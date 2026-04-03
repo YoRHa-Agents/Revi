@@ -2,79 +2,53 @@
 
 ## Overview
 
-Revi uses [Locust](https://locust.io) for HTTP pressure testing. Two user classes simulate realistic traffic:
+Revi no longer keeps a Python load-test stack. The supported performance checks
+now use:
 
-- **ReviewerUser** — Human reviewer: list items, get exports, add comments, mini resolve-flows
-- **AgentUser** — AI agent: poll exports, add structured feedback
+- `cargo bench --manifest-path server/Cargo.toml` for in-process Rust API
+  benchmarks.
+- `bash scripts/load-smoke.sh` for concurrent real-server smoke traffic against
+  the running Rust backend.
 
 ## Prerequisites
 
 ```bash
-pip install locust>=2.28.0
-# Start the backend first
+# Start the supported Rust backend first
 cd /path/to/Revi
-uvicorn backend.main:app --port 8000
+cargo run --manifest-path server/Cargo.toml --bin revi -- --port 8000
 ```
-
-## Load Scenarios
-
-| Scenario | Users | Spawn Rate | Duration | p95 Target | Error Target |
-|----------|-------|-----------|----------|-----------|-------------|
-| Smoke    | 1 ReviewerUser | 1/s | 30s | < 50ms | 0% |
-| Normal   | 10 ReviewerUser + 2 AgentUser | 2/s | 60s | < 100ms | < 1% |
-| Peak     | 50 ReviewerUser + 10 AgentUser | 5/s | 60s | < 500ms | < 5% |
-| Soak     | 5 ReviewerUser + 1 AgentUser | 1/s | 300s | stable | < 1% |
 
 ## Run Commands
 
-### Smoke test (headless)
+### API micro-benchmarks
 ```bash
-locust -f backend/tests/load/locustfile.py \
-  --host http://localhost:8000 \
-  --users 1 --spawn-rate 1 --run-time 30s --headless
+cd server
+cargo bench
 ```
 
-### Normal load (headless, with HTML report)
+### Concurrent smoke load
 ```bash
-locust -f backend/tests/load/locustfile.py \
-  --host http://localhost:8000 \
-  --users 12 --spawn-rate 2 --run-time 60s --headless \
-  --html backend/tests/load/report.html
+bash scripts/load-smoke.sh
 ```
 
-### Peak load
+Optional tuning:
+
 ```bash
-locust -f backend/tests/load/locustfile.py \
-  --host http://localhost:8000 \
-  --users 60 --spawn-rate 5 --run-time 60s --headless \
-  --html backend/tests/load/report.html
+REVI_LOAD_REQUESTS=100 REVI_LOAD_PARALLELISM=8 bash scripts/load-smoke.sh http://localhost:8000
 ```
 
-### Soak test
-```bash
-locust -f backend/tests/load/locustfile.py \
-  --host http://localhost:8000 \
-  --users 6 --spawn-rate 1 --run-time 300s --headless
-```
+## Targets
 
-### Interactive UI (opens browser at http://localhost:8089)
-```bash
-locust -f backend/tests/load/locustfile.py --host http://localhost:8000
-```
-
-## Reading Results
-
-The headless output shows:
-- **RPS** — requests per second
-- **p50/p95/p99** — latency percentiles in ms
-- **Failures** — failed request count and rate
-
-Targets are met when:
-- Normal scenario: p95 < 100ms, failure rate < 1%
-- Peak scenario: p95 < 500ms, failure rate < 5%
+- Smoke load should finish without HTTP failures.
+- `cargo bench` should stay stable across runs for `GET /api/reviews`,
+  `GET /api/reviews/{item_id}`, `POST /api/comments/{item_id}`, and
+  `GET /api/export/{item_id}`.
 
 ## Notes
 
-- The locustfile targets the real running server (not TestClient) — start backend before running
-- Comments accumulate during load tests; the backend uses an in-process cache so performance stays stable
-- For soak tests, monitor memory with `top` or `htop` — stable memory = no leak
+- `scripts/load-smoke.sh` targets the real Rust server, not the in-memory test
+  harness.
+- `cargo bench` measures handler-level performance without requiring any Python
+  tooling.
+- For longer runs, monitor memory with `top` or `htop` while the Rust backend is
+  serving requests.

@@ -1,3 +1,4 @@
+// The Rust `revi` server is the only supported API runtime.
 const BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8000'
 
 async function request(method, path, body) {

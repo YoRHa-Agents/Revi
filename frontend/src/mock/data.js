@@ -231,14 +231,14 @@ The \`/api/export/{item_id}\` endpoint returns:
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | \`/api/reviews\` | List all review items |
-| POST | \`/api/comments/{id}\` | Add a comment |
-| PATCH | \`/api/comments/{id}/resolve\` | Resolve a comment |
-| POST | \`/api/comments/{id}/archive\` | Archive resolved |
-| GET | \`/api/export/{id}\` | Agent export |
+| POST | \`/api/comments/{item_id}\` | Add a comment |
+| PATCH | \`/api/comments/{item_id}/{comment_id}/resolve\` | Resolve a comment |
+| POST | \`/api/archive/{item_id}\` | Archive resolved |
+| GET | \`/api/export/{item_id}\` | Agent export |
 
 ## Next Steps
 
-- [ ] Implement FastAPI backend
-- [ ] Wire frontend to real API
+- [ ] Keep Rust backend as the single runtime truth
+- [ ] Wire frontend to the base-aligned runtime and docs/demo entry points
 - [ ] Add file-upload support for designs
 `

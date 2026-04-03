@@ -510,10 +510,10 @@
           <p>Revi is a review tool that bridges human reviewers and AI agents. The system consists of a Vue 3 single-page application for human interaction and a REST API backend that both the frontend and AI agents consume.</p>
           <p>The primary goal is to enable <strong>anchored feedback</strong> — comments that are pinned to specific locations within plans, designs, and prototypes — so agents can programmatically read, act on, and resolve feedback.</p>
           <h2 id="sec-architecture">Architecture</h2>
-          <p>The backend is available in two implementations: a production-ready Rust binary using Axum, and a Python FastAPI reference implementation. Both expose the same REST API surface.</p>
-          <pre>Vue 3 SPA  &lt;--REST--&gt;  Backend (Rust/Python)
+          <p>The supported runtime is now a single Rust backend using Axum, paired with the Vue frontend and a vendored `common/` base that standardizes docs/demo/release entry points.</p>
+          <pre>Vue 3 SPA  &lt;--REST--&gt;  Rust backend (revi)
                               |
-AI Agent   &lt;--/export--&gt;  workspace/ + data/</pre>
+AI Agent   &lt;--/export--&gt;  workspace/ + data/ + common/</pre>
           <h2 id="sec-storage">Storage Layer</h2>
           <p>Comments are stored as JSON files on disk. Each item gets a comment file at <code>data/comments/{subfolder}__{stem}.json</code>. Archived batches go into <code>data/archive/{subfolder}__{stem}.json</code>.</p>
           <p>This file-system approach keeps the tool portable — no database setup required. The trade-off is that concurrent writes from multiple processes could conflict, but in practice Revi runs single-process.</p>
