@@ -1057,6 +1057,7 @@ dependencies = [
  "criterion",
  "http-body-util",
  "mime",
+ "mime_guess",
  "serde",
  "serde_json",
  "tempfile",

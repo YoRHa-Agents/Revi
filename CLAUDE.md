@@ -6,11 +6,11 @@ Revi is an agent-human review tool. Humans annotate plans/designs/prototypes; ag
 
 **Rust binary (recommended — zero dependencies):**
 ```bash
-# Zero config: uses ~/.revi/workspace and ~/.revi/data
+# No workspace needed — set it via the web UI or PATCH /api/config
 ./dist/revi-macos-aarch64     # macOS Apple Silicon
 ./dist/revi-linux-x86_64      # Linux x86-64
 
-# Custom paths
+# Or provide workspace directly
 ./revi --workspace /my/docs --data /my/data --port 8000
 
 # Or create revi.toml next to the binary:

@@ -15,10 +15,12 @@ pub async fn export_for_agent(
     Path(item_id): Path<String>,
 ) -> Result<Json<ExportResponse>, AppError> {
     let overrides = s.metadata.load().map_err(AppError::Internal)?;
-    let item = s
-        .scanner
-        .get_item(&item_id, &overrides)
-        .ok_or(AppError::NotFound)?;
+    let item = {
+        let scanner = s.scanner.read().unwrap();
+        scanner
+            .get_item(&item_id, &overrides)
+            .ok_or(AppError::NotFound)?
+    };
 
     let all_comments = s.comments.list(&item_id).map_err(AppError::Internal)?;
     let open_count = all_comments.iter().filter(|c| c.status == "open").count() as i64;
@@ -26,7 +28,6 @@ pub async fn export_for_agent(
         all_comments.iter().filter(|c| c.status == "resolved").count() as i64;
     let total = open_count + resolved_count;
 
-    // Export uses disk types directly for conversion
     let disk_comments = s.comments.list_disk(&item_id).map_err(AppError::Internal)?;
     let open_comments: Vec<ExportComment> = disk_comments
         .into_iter()

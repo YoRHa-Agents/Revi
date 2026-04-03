@@ -194,7 +194,8 @@ pub struct UploadResponse {
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigResponse {
-    pub workspace_path: String,
+    pub workspace_path: Option<String>,
+    pub workspace_configured: bool,
     pub data_path: String,
     pub port: u16,
     pub config_file: String,

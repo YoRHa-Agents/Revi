@@ -17,8 +17,8 @@ pub struct WorkspaceScanner {
 }
 
 impl WorkspaceScanner {
-    pub fn new(workspace: &Path) -> Self {
-        Self { workspace: workspace.to_path_buf() }
+    pub fn new(workspace: PathBuf) -> Self {
+        Self { workspace }
     }
 
     fn item_id(subfolder: &str, stem: &str) -> String {

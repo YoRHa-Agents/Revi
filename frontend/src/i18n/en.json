@@ -13,6 +13,20 @@
     "search": "Search...",
     "noResults": "No results"
   },
+  "workspace": {
+    "welcome": "Open a Workspace",
+    "description": "Point Revi to a directory of plans, designs, and prototypes — or connect to a remote Revi server.",
+    "localPath": "Local workspace path",
+    "pathPlaceholder": "/path/to/workspace",
+    "open": "Open",
+    "remoteServer": "Remote Revi server",
+    "remotePlaceholder": "http://192.168.1.100:8000",
+    "connect": "Connect",
+    "connectError": "Cannot connect to remote server",
+    "hint": "Workspace should contain plans/, designs/, and/or prototypes/ subdirectories.",
+    "current": "Workspace",
+    "change": "Change"
+  },
   "docIndex": {
     "title": "Index",
     "hide": "Hide"

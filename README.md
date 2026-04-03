@@ -59,24 +59,40 @@ This repository now treats `RustWebAppCommon` as the base pattern: shared contra
 
 ## Quick Start
 
-### Option A — Rust + Vue (recommended)
+### Option A — Zero-config (no workspace argument)
 
 ```bash
-# Linux x86-64
-./dist/revi-linux-x86_64
-
-# macOS Apple Silicon
-./dist/revi-macos-aarch64
+# Start the server with no workspace — choose it in the web UI
+./dist/revi-linux-x86_64     # Linux x86-64
+./dist/revi-macos-aarch64    # macOS Apple Silicon
 ```
 
-Auto-creates `~/.revi/workspace/` and `~/.revi/data/` on first run. Then start the frontend:
+Then start the frontend:
 
 ```bash
 cd frontend && npm install && npm run dev
 # → http://localhost:5173
 ```
 
-### Option B — Common front door (base-aligned)
+Open the browser — the **Workspace Setup** screen lets you:
+- Enter a **local directory path** to scan for plans/designs/prototypes
+- **Connect to a remote Revi server** by URL (e.g. `http://192.168.1.100:8000`)
+
+The workspace is set at runtime via `PATCH /api/config` — no restart needed.
+
+### Option B — With workspace path
+
+```bash
+# Provide workspace directly via CLI
+./dist/revi-linux-x86_64 --workspace /my/docs
+
+# Or via config file
+./revi --workspace /my/docs --data /my/data --port 9000
+```
+
+Auto-creates directories on first run. Then start the frontend as above.
+
+### Option C — Common front door (base-aligned)
 
 ```bash
 cargo run --manifest-path common/cli/Cargo.toml -- dev --surface web --host 127.0.0.1 --port 5173
@@ -95,6 +111,18 @@ cd frontend && npm run dev -- --host 127.0.0.1 --port 5173
 workspace = "/my/docs"
 data      = "/my/data"
 port      = 9000
+```
+
+Workspace and server config can also be changed at runtime:
+
+```bash
+# Set workspace without restarting
+curl -X PATCH http://localhost:8000/api/config \
+  -H "Content-Type: application/json" \
+  -d '{"workspacePath":"/new/workspace"}'
+
+# Check current config
+curl http://localhost:8000/api/config
 ```
 
 ## Architecture
@@ -156,8 +184,8 @@ The `item_id` format is `{subfolder}/{stem}` — e.g. `plans/sprint-1-design`, `
 | `POST` | `/api/archive/{item_id}` | Archive all resolved comments |
 | `GET` | `/api/archive/{item_id}` | List archived batches |
 | `POST` | `/api/upload` | Upload a file to workspace; server infers or accepts `type` for target subfolder |
-| `GET` | `/api/config` | View server config |
-| `PATCH` | `/api/config` | Update config |
+| `GET` | `/api/config` | View server config (includes `workspaceConfigured` flag) |
+| `PATCH` | `/api/config` | Update config — hot-reloads workspace at runtime, no restart needed |
 
 ## Workspace Structure
 

@@ -24,10 +24,12 @@ pub async fn add_comment(
     Path(item_id): Path<String>,
     Json(body): Json<AddCommentRequest>,
 ) -> Result<impl IntoResponse, AppError> {
-    // Validate item exists
-    let overrides = s.metadata.load().map_err(AppError::Internal)?;
-    if s.scanner.get_item(&item_id, &overrides).is_none() {
-        return Err(AppError::NotFound);
+    {
+        let overrides = s.metadata.load().map_err(AppError::Internal)?;
+        let scanner = s.scanner.read().unwrap();
+        if scanner.get_item(&item_id, &overrides).is_none() {
+            return Err(AppError::NotFound);
+        }
     }
     let comment = s
         .comments

@@ -8,6 +8,11 @@ export const state = reactive({
   loading: false,
   error: null,
 
+  // Workspace / config state
+  config: null,
+  configLoading: false,
+  workspaceConfigured: null, // null = unknown, true/false from server
+
   getItem(id) {
     return this.items.find(i => i.id === id)
   },
@@ -19,6 +24,34 @@ export const state = reactive({
   },
   resolvedCount(itemId) {
     return (this.comments[itemId] || []).filter(c => c.status === 'resolved').length
+  },
+
+  async fetchConfig() {
+    this.configLoading = true
+    try {
+      this.config = await api.getConfig()
+      this.workspaceConfigured = this.config.workspaceConfigured
+    } catch (e) {
+      this.error = e.message
+      this.workspaceConfigured = false
+    } finally {
+      this.configLoading = false
+    }
+  },
+
+  async setWorkspacePath(path) {
+    this.configLoading = true
+    this.error = null
+    try {
+      this.config = await api.updateConfig({ workspacePath: path })
+      this.workspaceConfigured = this.config.workspaceConfigured
+      await this.fetchItems()
+    } catch (e) {
+      this.error = e.message
+      throw e
+    } finally {
+      this.configLoading = false
+    }
   },
 
   async fetchItems() {
@@ -57,7 +90,6 @@ export const state = reactive({
 
   async archiveResolved(itemId) {
     const batch = await api.archiveResolved(itemId)
-    // remove resolved from local comments cache
     if (this.comments[itemId]) {
       this.comments[itemId] = this.comments[itemId].filter(c => c.status === 'open')
     }
