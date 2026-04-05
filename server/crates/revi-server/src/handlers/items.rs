@@ -13,7 +13,7 @@ use crate::{
 
 pub async fn list_reviews(State(s): State<AppState>) -> Result<Json<Vec<ReviewItem>>, AppError> {
     let overrides = s.metadata.load().map_err(AppError::Internal)?;
-    let scanner = s.scanner.read().unwrap();
+    let scanner = s.scanner.read().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
     let mut items = scanner.scan(&overrides);
     for item in &mut items {
         item.open_count = s.comments.open_count(&item.id).unwrap_or(0);
@@ -27,7 +27,7 @@ pub async fn get_review(
     Path(item_id): Path<String>,
 ) -> Result<Json<ReviewItemDetail>, AppError> {
     let overrides = s.metadata.load().map_err(AppError::Internal)?;
-    let scanner = s.scanner.read().unwrap();
+    let scanner = s.scanner.read().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
     let mut detail = scanner
         .get_detail(&item_id, "/workspace", &overrides)
         .ok_or(AppError::NotFound)?;
@@ -50,7 +50,7 @@ pub async fn update_review_type(
     }
     {
         let overrides = s.metadata.load().map_err(AppError::Internal)?;
-        let scanner = s.scanner.read().unwrap();
+        let scanner = s.scanner.read().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
         if scanner.get_item(&item_id, &overrides).is_none() {
             return Err(AppError::NotFound);
         }
@@ -60,7 +60,7 @@ pub async fn update_review_type(
         .map_err(AppError::Internal)?;
 
     let overrides = s.metadata.load().map_err(AppError::Internal)?;
-    let scanner = s.scanner.read().unwrap();
+    let scanner = s.scanner.read().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
     let mut item = scanner
         .get_item(&item_id, &overrides)
         .ok_or(AppError::NotFound)?;

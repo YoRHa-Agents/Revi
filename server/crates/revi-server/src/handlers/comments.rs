@@ -26,7 +26,7 @@ pub async fn add_comment(
 ) -> Result<impl IntoResponse, AppError> {
     {
         let overrides = s.metadata.load().map_err(AppError::Internal)?;
-        let scanner = s.scanner.read().unwrap();
+        let scanner = s.scanner.read().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
         if scanner.get_item(&item_id, &overrides).is_none() {
             return Err(AppError::NotFound);
         }

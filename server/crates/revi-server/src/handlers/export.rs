@@ -16,7 +16,7 @@ pub async fn export_for_agent(
 ) -> Result<Json<ExportResponse>, AppError> {
     let overrides = s.metadata.load().map_err(AppError::Internal)?;
     let item = {
-        let scanner = s.scanner.read().unwrap();
+        let scanner = s.scanner.read().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
         scanner
             .get_item(&item_id, &overrides)
             .ok_or(AppError::NotFound)?

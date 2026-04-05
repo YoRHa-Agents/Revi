@@ -13,7 +13,7 @@
           :key="i"
           class="step-item"
           :class="{ active: current === i, done: current > i, hovered: isHoveredStep(i) }"
-          role="button"
+          :aria-current="current === i ? 'step' : undefined"
           tabindex="0"
           @click="current = i"
           @keydown.enter="current = i"
@@ -593,4 +593,22 @@ const steps = [
   align-self: flex-start;
 }
 .actor-icon { font-size: 14px; }
+
+@media (max-width: 767px) {
+  .proto-viewer { flex-direction: column; }
+  .steps-nav {
+    width: 100%; flex-direction: row; align-items: center;
+    border-right: none; border-bottom: 1px solid var(--border);
+  }
+  .nav-header { display: none; }
+  .steps-list {
+    flex: 1; flex-direction: row; overflow-x: auto; padding: 4px 8px; gap: 0;
+  }
+  .step-item { flex-shrink: 0; padding: 6px 10px; gap: 6px; }
+  .step-info { display: none; }
+  .step-anchor-btn { display: none; }
+  .nav-btns { border-top: none; border-left: 1px solid var(--border); padding: 6px 8px; }
+  .step-desc { padding: 12px 16px; }
+  .desc-title { font-size: 14px; }
+}
 </style>

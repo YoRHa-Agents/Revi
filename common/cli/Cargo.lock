@@ -817,6 +817,7 @@ dependencies = [
  "common_core",
  "http-body-util",
  "mime",
+ "mime_guess",
  "serde",
  "serde_json",
  "thiserror",

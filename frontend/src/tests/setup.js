@@ -1,2 +1,3 @@
 import { vi } from 'vitest'
-// Global test setup
+
+Element.prototype.scrollIntoView = vi.fn()

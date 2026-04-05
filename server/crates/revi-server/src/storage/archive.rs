@@ -26,7 +26,7 @@ impl ArchiveStore {
     }
 
     fn load(&self, item_id: &str) -> anyhow::Result<Vec<ArchiveBatchDisk>> {
-        let mut cache = self.cache.lock().unwrap();
+        let mut cache = self.cache.lock().map_err(|_| anyhow::anyhow!("archive cache lock poisoned"))?;
         if let Some(v) = cache.get(item_id) {
             return Ok(v.clone());
         }
@@ -46,7 +46,7 @@ impl ArchiveStore {
         let tmp = path.with_extension("tmp");
         std::fs::write(&tmp, serde_json::to_string(&data)?).context("write tmp")?;
         std::fs::rename(&tmp, &path).context("rename")?;
-        self.cache.lock().unwrap().insert(item_id.to_owned(), data);
+        self.cache.lock().map_err(|_| anyhow::anyhow!("archive cache lock poisoned"))?.insert(item_id.to_owned(), data);
         Ok(())
     }
 

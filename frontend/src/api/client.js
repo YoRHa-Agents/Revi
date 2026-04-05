@@ -39,7 +39,14 @@ export const api = {
   archiveResolved: (id)      => request('POST',  `/api/archive/${id}`),
   getArchive:      (id)      => request('GET',   `/api/archive/${id}`),
   exportForAgent:  (id)      => request('GET',   `/api/export/${id}`),
-  upload:          (fd)      => fetch(serverState.base + '/api/upload', { method: 'POST', body: fd }).then(r => r.json()),
+  upload: async (fd) => {
+    const res = await fetch(serverState.base + '/api/upload', { method: 'POST', body: fd })
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new Error(`POST /api/upload → ${res.status}: ${text}`)
+    }
+    return res.json()
+  },
   updateType: (id, type) => request('PATCH', `/api/reviews/${id}`, { type }),
   getConfig:       ()        => request('GET',   '/api/config'),
   updateConfig:    (body)    => request('PATCH', '/api/config', body),

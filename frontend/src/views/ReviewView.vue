@@ -27,12 +27,16 @@
         </div>
       </div>
 
+      <div class="mobile-pane-tabs">
+        <button :class="{ active: mobileTab === 'content' }" @click="mobileTab = 'content'">Content</button>
+        <button :class="{ active: mobileTab === 'comments' }" @click="mobileTab = 'comments'">Comments</button>
+      </div>
       <div class="split-layout">
         <transition name="index-slide">
           <DocIndex v-if="showIndex && item.type === 'plan'" :content="itemDetail?.contentText ?? ''" @hide="showIndex = false" />
         </transition>
 
-        <div class="content-pane">
+        <div class="content-pane" :class="{ 'mobile-hidden': mobileTab === 'comments' }">
           <MarkdownViewer
             v-if="item.type === 'plan'"
             :content="itemDetail?.contentText ?? ''"
@@ -55,7 +59,7 @@
           />
         </div>
 
-        <div class="comment-pane">
+        <div class="comment-pane" :class="{ 'mobile-hidden': mobileTab === 'content' }">
           <CommentPanel
             :itemId="item.id"
             :pendingAnchor="pendingAnchor"
@@ -86,6 +90,7 @@ const route = useRoute()
 const { t, locale } = useI18n()
 
 const showIndex    = ref(false)
+const mobileTab    = ref('content')
 const showSearch   = ref(false)
 const pendingAnchor = ref(null)
 const hoveredAnchor = ref(null)
@@ -123,7 +128,11 @@ onMounted(async () => {
 
 async function changeItemType(newType) {
   if (!item.value || newType === item.value.type) return
-  await state.updateItemType(item.value.id, newType)
+  try {
+    await state.updateItemType(item.value.id, newType)
+  } catch (e) {
+    console.error('[ReviewView] changeItemType failed:', e)
+  }
 }
 </script>
 
@@ -173,4 +182,30 @@ async function changeItemType(newType) {
 .index-slide-enter-active, .index-slide-leave-active { transition: width 0.2s ease, opacity 0.15s ease; overflow: hidden; }
 .index-slide-enter-from, .index-slide-leave-to  { width: 0; opacity: 0; }
 .index-slide-enter-to,   .index-slide-leave-from { width: 180px; opacity: 1; }
+
+.mobile-pane-tabs { display: none; }
+
+@media (max-width: 767px) {
+  .review-page { padding: 10px 12px 12px; }
+  .review-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .review-title { font-size: 15px; }
+  .mobile-pane-tabs {
+    display: flex; flex-shrink: 0; margin-top: 8px;
+    border: 1px solid var(--border); border-radius: 3px; overflow: hidden;
+  }
+  .mobile-pane-tabs button {
+    flex: 1; padding: 8px; font-size: 13px; font-weight: 500;
+    background: transparent; border: none; cursor: pointer;
+    color: var(--text-dim); transition: color 0.15s, background 0.15s;
+    font-family: inherit;
+  }
+  .mobile-pane-tabs button.active {
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .split-layout { flex-direction: column; }
+  .comment-pane { width: 100%; flex-shrink: 0; max-height: 50vh; }
+  .content-pane { border-right: none; border-bottom: 1px solid var(--border); }
+  .mobile-hidden { display: none !important; }
+  .index-slide-enter-to, .index-slide-leave-from { width: 100%; }
+}
 </style>

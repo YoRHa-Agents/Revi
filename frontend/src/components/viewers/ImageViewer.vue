@@ -8,7 +8,7 @@
       <span class="board-meta">2 screens · 6 annotations · double-click frame to expand</span>
     </div>
 
-    <div class="canvas">
+    <div class="canvas" role="img" aria-label="Design mockup with annotation pins">
       <!-- Frame 1 -->
       <div class="frame" :class="{ expanded: expandedFrame === 1 }">
         <div class="frame-label">Frame 1 / Dashboard</div>
@@ -58,6 +58,10 @@
             :style="{ left: p.x + 'px', top: p.y + 'px' }"
             @click.stop="emitAnnotation(p)"
             :title="'Click to comment on: ' + annotations[p.n - 1]?.title"
+            :aria-label="'Annotation ' + p.n + ': ' + (annotations[p.n - 1]?.title || '')"
+            role="button"
+            tabindex="0"
+            @keydown.enter.stop="emitAnnotation(p)"
           >{{ p.n }}</div>
         </div>
       </div>
@@ -130,6 +134,10 @@
             :style="{ left: p.x + 'px', top: p.y + 'px' }"
             @click.stop="emitAnnotation(p)"
             :title="'Click to comment on: ' + annotations[p.n - 1]?.title"
+            :aria-label="'Annotation ' + p.n + ': ' + (annotations[p.n - 1]?.title || '')"
+            role="button"
+            tabindex="0"
+            @keydown.enter.stop="emitAnnotation(p)"
           >{{ p.n }}</div>
         </div>
       </div>
@@ -385,5 +393,19 @@ function emitAnnotation(p) {
 .m-cpbtn {
   font-size: 6px; color: var(--green); background: transparent; border: 1px solid var(--green);
   padding: 1px 5px; border-radius: 3px; display: inline-block; margin-top: 2px;
+}
+
+@media (max-width: 767px) {
+  .canvas { padding: 16px; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .frame-screen { width: 320px; height: 196px; }
+  .frame.expanded { inset: 50px 10px; }
+  .frame.expanded .frame-screen { width: 320px !important; height: 196px !important; }
+  .legend { padding: 8px 16px; gap: 8px 12px; }
+  .board-meta { display: none; }
+  .ann-desc { display: none; }
+}
+@media (max-width: 480px) {
+  .frame-screen { width: 280px; height: 172px; }
+  .frame.expanded .frame-screen { width: 280px !important; height: 172px !important; }
 }
 </style>

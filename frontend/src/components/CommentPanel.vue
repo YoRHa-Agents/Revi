@@ -1,14 +1,15 @@
 <template>
   <div class="panel">
-    <div class="tabs">
-      <button class="tab" :class="{ active: tab === 'open' }" @click="tab = 'open'">
+    <div class="tabs" role="tablist">
+      <button class="tab" :class="{ active: tab === 'open' }" role="tab" :aria-selected="tab === 'open'" @click="tab = 'open'">
         {{ t('review.openTab', { n: openComments.length }) }}
       </button>
-      <button class="tab" :class="{ active: tab === 'resolved' }" @click="tab = 'resolved'">
+      <button class="tab" :class="{ active: tab === 'resolved' }" role="tab" :aria-selected="tab === 'resolved'" @click="tab = 'resolved'">
         {{ t('review.resolvedTab', { n: resolvedComments.length }) }}
       </button>
     </div>
 
+    <div v-if="errorMsg" class="error-bar">{{ errorMsg }}</div>
     <div class="actions-bar">
       <button class="btn-primary" @click="toggleForm">
         {{ showForm ? t('review.cancel') : t('review.addComment') }}
@@ -32,16 +33,16 @@
         </div>
 
         <div class="field">
-          <label>{{ t('review.author') }}</label>
-          <input ref="authorInputEl" v-model="form.author" type="text" placeholder="Your name" />
+          <label for="comment-author">{{ t('review.author') }}</label>
+          <input id="comment-author" ref="authorInputEl" v-model="form.author" type="text" placeholder="Your name" />
         </div>
         <div class="field">
-          <label>{{ t('review.content') }}</label>
-          <textarea v-model="form.content" rows="3" :placeholder="t('review.content') + '...'"></textarea>
+          <label for="comment-content">{{ t('review.content') }}</label>
+          <textarea id="comment-content" v-model="form.content" rows="3" :placeholder="t('review.content') + '...'"></textarea>
         </div>
         <div v-if="!form.anchor" class="field">
-          <label>{{ t('review.reference') }}</label>
-          <input v-model="form.reference" type="text" :placeholder="t('review.referencePlaceholder')" />
+          <label for="comment-reference">{{ t('review.reference') }}</label>
+          <input id="comment-reference" v-model="form.reference" type="text" :placeholder="t('review.referencePlaceholder')" />
         </div>
         <button class="btn-submit" @click="submitComment" :disabled="!form.author || !form.content">
           {{ t('review.submit') }}
@@ -49,7 +50,7 @@
       </div>
     </transition>
 
-    <div class="comments" ref="commentsEl">
+    <div class="comments" ref="commentsEl" role="tabpanel">
       <template v-if="tab === 'open'">
         <div v-if="!openComments.length" class="empty">{{ t('review.noOpen') }}</div>
         <div
@@ -232,6 +233,8 @@ function relativeTime(iso) {
   return t('time.hoursAgo', { n: Math.floor(diff / 60) })
 }
 
+const errorMsg = ref('')
+
 async function submitComment() {
   if (!form.value.author || !form.value.content) return
   const reference = form.value.anchor
@@ -240,22 +243,37 @@ async function submitComment() {
       ? { type: 'section', value: form.value.reference }
       : { type: 'general', value: null }
 
-  await state.addComment(props.itemId, { author: form.value.author, content: form.value.content, reference })
-  form.value = { author: '', content: '', reference: '', anchor: null }
-  showForm.value = false
-  await refreshExport()
+  try {
+    errorMsg.value = ''
+    await state.addComment(props.itemId, { author: form.value.author, content: form.value.content, reference })
+    form.value = { author: '', content: '', reference: '', anchor: null }
+    showForm.value = false
+    await refreshExport()
+  } catch (e) {
+    errorMsg.value = e.message || 'Failed to submit comment'
+  }
 }
 
 async function resolve(commentId) {
-  await state.resolveComment(props.itemId, commentId)
-  if (!openComments.value.length) tab.value = 'resolved'
-  await refreshExport()
+  try {
+    errorMsg.value = ''
+    await state.resolveComment(props.itemId, commentId)
+    if (!openComments.value.length) tab.value = 'resolved'
+    await refreshExport()
+  } catch (e) {
+    errorMsg.value = e.message || 'Failed to resolve comment'
+  }
 }
 
 async function archiveResolved() {
-  await state.archiveResolved(props.itemId)
-  tab.value = 'open'
-  await refreshExport()
+  try {
+    errorMsg.value = ''
+    await state.archiveResolved(props.itemId)
+    tab.value = 'open'
+    await refreshExport()
+  } catch (e) {
+    errorMsg.value = e.message || 'Failed to archive comments'
+  }
 }
 </script>
 
@@ -271,6 +289,7 @@ async function archiveResolved() {
 .tab.active { color: var(--text); border-bottom-color: var(--accent); }
 .tab:hover  { color: var(--text); background: var(--accent-soft); }
 
+.error-bar { padding: 8px 12px; background: #f8d7da; color: #721c24; font-size: 13px; border-bottom: 1px solid #f5c6cb; flex-shrink: 0; }
 .actions-bar { display: flex; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border-light); flex-shrink: 0; }
 .btn-primary {
   font-size: 13px; font-weight: 500; padding: 6px 12px;
@@ -390,5 +409,10 @@ async function archiveResolved() {
   padding: 12px; font-size: 11px; border: 1px solid #454138;
   overflow-x: auto; max-height: 280px; overflow-y: auto;
   font-family: var(--mono);
+}
+
+@media (max-width: 767px) {
+  .actions-bar { flex-wrap: wrap; }
+  .export-json { max-height: 200px; }
 }
 </style>
