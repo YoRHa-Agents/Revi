@@ -11,6 +11,8 @@ use crate::{
     router::AppState,
 };
 
+const MAX_UPLOAD_SIZE: usize = 50 * 1024 * 1024; // 50 MB
+
 const DESIGN_EXTS: &[&str] = &["png", "jpg", "jpeg", "svg", "webp", "pdf"];
 const PLAN_EXTS: &[&str] = &["md"];
 const PROTO_EXTS: &[&str] = &["html", "htm"];
@@ -73,10 +75,25 @@ pub async fn upload_file(
         }
     }
 
-    let filename =
+    let raw_filename =
         filename.ok_or_else(|| AppError::BadRequest("missing file field".to_owned()))?;
     let file_bytes =
         file_bytes.ok_or_else(|| AppError::BadRequest("missing file data".to_owned()))?;
+
+    if file_bytes.len() > MAX_UPLOAD_SIZE {
+        return Err(AppError::BadRequest(format!(
+            "file too large ({} bytes, max {} bytes)",
+            file_bytes.len(),
+            MAX_UPLOAD_SIZE
+        )));
+    }
+
+    let filename = std::path::Path::new(&raw_filename)
+        .file_name()
+        .and_then(|f| f.to_str())
+        .map(str::to_owned)
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| AppError::BadRequest("invalid filename".to_owned()))?;
 
     let ext = std::path::Path::new(&filename)
         .extension()
@@ -93,7 +110,7 @@ pub async fn upload_file(
     };
 
     let workspace_path = {
-        let cfg = s.config.read().unwrap();
+        let cfg = s.config.read().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
         cfg.effective_workspace()
     };
 

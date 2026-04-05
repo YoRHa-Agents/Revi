@@ -7,5 +7,11 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/tests/setup.js'],
     exclude: ['**/node_modules/**', '**/e2e/**', '**/*.spec.js'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'text-summary'],
+      include: ['src/**/*.{js,vue}'],
+      exclude: ['src/tests/**', 'src/mock/**'],
+    },
   },
 })

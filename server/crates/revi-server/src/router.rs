@@ -47,8 +47,12 @@ async fn serve_workspace_file(
     State(s): State<AppState>,
     Path(path): Path<String>,
 ) -> Response {
+    if path.split('/').any(|seg| seg.starts_with('.')) {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
     let workspace = {
-        let cfg = s.config.read().unwrap();
+        let cfg = s.config.read().expect("config lock poisoned");
         cfg.effective_workspace()
     };
     let file_path = workspace.join(&path);
@@ -67,7 +71,14 @@ async fn serve_workspace_file(
 
     let bytes = match tokio::fs::read(&file_path).await {
         Ok(b) => b,
-        Err(_) => return StatusCode::NOT_FOUND.into_response(),
+        Err(e) => {
+            let status = match e.kind() {
+                std::io::ErrorKind::NotFound => StatusCode::NOT_FOUND,
+                std::io::ErrorKind::PermissionDenied => StatusCode::FORBIDDEN,
+                _ => StatusCode::INTERNAL_SERVER_ERROR,
+            };
+            return status.into_response();
+        }
     };
 
     let mime = mime_guess::from_path(&file_path)

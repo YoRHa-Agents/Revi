@@ -103,4 +103,11 @@ function formatDate(iso) {
 }
 .ref-badge { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; color: var(--text-faint); }
 .c-content { font-size: 14px; color: var(--text-dim); line-height: 1.5; }
+
+@media (max-width: 767px) {
+  .archive-page { padding: 20px 16px; }
+  .batch-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .c-meta { flex-wrap: wrap; }
+  .c-ref { word-break: break-all; }
+}
 </style>

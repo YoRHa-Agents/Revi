@@ -14,4 +14,5 @@ export const i18n = createI18n({
 export function setLang(lang) {
   i18n.global.locale.value = lang
   localStorage.setItem('revi-lang', lang)
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en'
 }

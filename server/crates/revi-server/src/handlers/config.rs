@@ -10,9 +10,9 @@ use crate::{
     workspace::scanner::WorkspaceScanner,
 };
 
-pub async fn get_config(State(s): State<AppState>) -> Json<ConfigResponse> {
-    let cfg = s.config.read().unwrap();
-    Json(config_to_response(&cfg))
+pub async fn get_config(State(s): State<AppState>) -> Result<Json<ConfigResponse>, AppError> {
+    let cfg = s.config.read().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
+    Ok(Json(config_to_response(&cfg)))
 }
 
 pub async fn update_config(
@@ -20,7 +20,7 @@ pub async fn update_config(
     Json(req): Json<UpdateConfigRequest>,
 ) -> Result<Json<ConfigResponse>, AppError> {
     let updated = {
-        let current = s.config.read().unwrap();
+        let current = s.config.read().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
 
         let workspace_path = if let Some(ref ws) = req.workspace_path {
             Some(PathBuf::from(ws))
@@ -53,14 +53,14 @@ pub async fn update_config(
 
     {
         let new_scanner = WorkspaceScanner::new(updated.effective_workspace());
-        let mut scanner = s.scanner.write().unwrap();
+        let mut scanner = s.scanner.write().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
         *scanner = new_scanner;
     }
 
     let response = config_to_response(&updated);
 
     {
-        let mut cfg = s.config.write().unwrap();
+        let mut cfg = s.config.write().map_err(|_| AppError::Internal(anyhow::anyhow!("lock poisoned")))?;
         *cfg = updated;
     }
 

@@ -119,9 +119,9 @@
               @change="onFilesSelected($event.target.files); $refs.folderInput.value=''" />
           </div>
 
-          <div v-if="pendingFiles.length" class="upload-modal-overlay" @click.self="pendingFiles = []">
+          <div v-if="pendingFiles.length" class="upload-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="upload-modal-title" @click.self="pendingFiles = []">
             <div class="upload-modal">
-              <h3 class="modal-title">{{ t('home.uploadFiles') }}</h3>
+              <h3 class="modal-title" id="upload-modal-title">{{ t('home.uploadFiles') }}</h3>
               <div class="file-list">
                 <div v-for="(pf, i) in pendingFiles" :key="i" class="file-row">
                   <span class="file-name">{{ pf.file.name }}</span>
@@ -502,4 +502,27 @@ function relativeTime(iso) {
 .open-btn:active { transform: scale(0.97); }
 .btn-arrow { font-size: 14px; transition: transform 0.15s; }
 .open-btn:hover .btn-arrow { transform: translateX(3px); }
+
+@media (max-width: 767px) {
+  .home { padding: 20px 16px; gap: 20px; }
+  .hero { flex-direction: column; gap: 16px; padding: 20px; text-align: center; }
+  .hero-tagline { max-width: none; }
+  .hero-badge { align-self: center; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .item-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .upload-modal { min-width: auto; width: 90vw; max-width: 420px; }
+  .section-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .setup-card { padding: 28px 20px; }
+  .input-row { flex-direction: column; }
+  .workspace-indicator { flex-wrap: wrap; }
+}
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .upload-actions { flex-direction: column; }
+  .card-footer { flex-direction: column; gap: 8px; align-items: flex-start; }
+  .open-btn { align-self: stretch; justify-content: center; }
+}
+@media (hover: none) {
+  .item-card:hover { transform: none; }
+}
 </style>

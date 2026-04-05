@@ -3,11 +3,11 @@
     <div v-if="showSearch" class="in-search-bar">
       <span class="search-icon-sm">⌕</span>
       <input ref="searchInputEl" v-model="query" type="text" class="search-in-input"
-        placeholder="Search in document..." @keydown.enter="next" @keydown.esc="closeSearch" />
+        placeholder="Search in document..." aria-label="Search in document" @keydown.enter="next" @keydown.esc="closeSearch" />
       <span class="match-info" :class="{ nomatch: query && !matches.length }">{{ matchLabel }}</span>
-      <button class="nav-btn" @click="prev" :disabled="!matches.length">↑</button>
-      <button class="nav-btn" @click="next" :disabled="!matches.length">↓</button>
-      <button class="close-btn" @click="closeSearch">×</button>
+      <button class="nav-btn" @click="prev" :disabled="!matches.length" aria-label="Previous match">↑</button>
+      <button class="nav-btn" @click="next" :disabled="!matches.length" aria-label="Next match">↓</button>
+      <button class="close-btn" @click="closeSearch" aria-label="Close search">×</button>
     </div>
 
     <div class="md-viewer" ref="contentEl" v-html="rendered"
@@ -28,6 +28,7 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { marked, Renderer } from 'marked'
+import DOMPurify from 'dompurify'
 
 const props = defineProps({
   content:       { type: String,  required: true },
@@ -54,7 +55,7 @@ renderer.heading = (text, level) => {
   return `<h${level} id="${id}">${text}</h${level}>\n`
 }
 marked.use({ renderer })
-const rendered = computed(() => marked.parse(props.content))
+const rendered = computed(() => DOMPurify.sanitize(marked.parse(props.content)))
 
 // ── Search ────────────────────────────────────────────────────
 const matchLabel = computed(() => {
@@ -199,6 +200,7 @@ function onMouseUp() {
     const sel = window.getSelection()
     const text = sel?.toString().trim()
     if (!text || !contentEl.value?.contains(sel.anchorNode)) { tooltipVisible.value = false; return }
+    if (!sel.rangeCount) return
     const rect = sel.getRangeAt(0).getBoundingClientRect()
     selText.value    = text
     selSection.value = getNearestSection(sel.anchorNode)
@@ -253,6 +255,12 @@ onUnmounted(() => document.removeEventListener('selectionchange', onSelectionCha
 .close-btn:hover { background: var(--accent-soft); color: var(--accent); }
 
 .md-viewer { flex: 1; padding: 24px 32px; line-height: 1.7; font-size: 15px; color: var(--text); overflow-y: auto; }
+
+@media (max-width: 767px) {
+  .md-viewer { padding: 16px; font-size: 14px; }
+  .in-search-bar { flex-wrap: wrap; }
+  .match-info { min-width: auto; }
+}
 </style>
 
 <style>
@@ -308,4 +316,9 @@ mark.hover-hl {
 }
 .sel-btn:hover { background: var(--accent); }
 .sel-icon { font-size: 14px; }
+
+@media (max-width: 767px) {
+  .md-viewer table { display: block; overflow-x: auto; }
+  .md-viewer pre { max-width: 100%; }
+}
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" role="navigation" aria-label="File browser">
     <!-- Header + search -->
     <div class="sidebar-top">
       <span class="section-label">{{ t('sidebar.workspace') }}</span>
@@ -9,6 +9,7 @@
           v-model="query"
           type="text"
           :placeholder="t('sidebar.search')"
+          :aria-label="t('sidebar.search')"
           class="search-input"
           @focus="searchFocused = true"
           @blur="searchFocused = false"
@@ -42,7 +43,7 @@
     <!-- File groups by type -->
     <template v-else>
       <div v-for="group in groups" :key="group.type" class="file-group">
-        <button class="group-header" @click="toggleGroup(group.type)">
+        <button class="group-header" @click="toggleGroup(group.type)" :aria-expanded="!collapsed[group.type]">
           <span class="chevron" :class="{ open: !collapsed[group.type] }">›</span>
           <span class="group-icon">{{ group.icon }}</span>
           <span class="group-name">{{ group.label }}</span>
@@ -201,4 +202,17 @@ const groups = computed(() => [
 
 .slide-enter-active, .slide-leave-active { transition: opacity 0.15s, transform 0.15s; }
 .slide-enter-from, .slide-leave-to { opacity: 0; transform: translateY(-4px); }
+
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed; top: 44px; left: 0; bottom: 0;
+    width: 280px; z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
 </style>

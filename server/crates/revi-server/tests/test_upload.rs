@@ -103,6 +103,45 @@ async fn test_upload_unsupported_extension_returns_400() {
 }
 
 #[tokio::test]
+async fn test_upload_path_traversal_in_filename_sanitized() {
+    let fx = AppFixture::new();
+    let body = body_json(upload(&fx, "../evil.md", b"# Evil\n").await).await;
+    assert_eq!(body["filename"], "evil.md");
+    assert!(
+        !body["itemId"].as_str().unwrap().contains(".."),
+        "itemId must not contain path traversal"
+    );
+}
+
+#[tokio::test]
+async fn test_upload_deep_traversal_filename_sanitized() {
+    let fx = AppFixture::new();
+    let body = body_json(upload(&fx, "../../etc/evil.md", b"# Evil\n").await).await;
+    assert_eq!(body["filename"], "evil.md");
+}
+
+#[tokio::test]
+async fn test_upload_empty_filename_rejected() {
+    let fx = AppFixture::new();
+    let (status, _) = body_status_json(upload(&fx, "", b"data").await).await;
+    assert_eq!(status, 400);
+}
+
+#[tokio::test]
+async fn test_upload_dotdot_only_filename_rejected() {
+    let fx = AppFixture::new();
+    let (status, _) = body_status_json(upload(&fx, "..", b"data").await).await;
+    assert_eq!(status, 400);
+}
+
+#[tokio::test]
+async fn test_upload_exe_extension_rejected() {
+    let fx = AppFixture::new();
+    let (status, _) = body_status_json(upload(&fx, "malware.exe", b"\x00").await).await;
+    assert_eq!(status, 400);
+}
+
+#[tokio::test]
 async fn test_uploaded_item_discoverable() {
     let fx = AppFixture::new();
     upload(&fx, "fresh-plan.md", b"# Fresh Plan\n").await;

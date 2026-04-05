@@ -4,7 +4,7 @@
       <span class="index-title">{{ t('docIndex.title') }}</span>
       <button class="hide-btn" @click="emit('hide')" :title="t('docIndex.hide')">←</button>
     </div>
-    <nav class="index-nav">
+    <nav class="index-nav" role="navigation" aria-label="Document outline">
       <a
         v-for="h in headings"
         :key="h.id"
@@ -77,4 +77,8 @@ function scrollTo(id) {
 .heading-item.level-1 { font-weight: 500; color: var(--text); padding-left: 12px; }
 .heading-item.level-2 { padding-left: 20px; }
 .heading-item.level-3 { padding-left: 28px; font-size: 11px; color: var(--text-faint); }
+
+@media (max-width: 767px) {
+  .doc-index { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 200px; }
+}
 </style>
